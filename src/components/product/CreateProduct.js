@@ -499,11 +499,12 @@ export class CreateProduct {
     buttonLoading.style.display = 'inline';
 
     try {
+      console.log('=== SAVING PRODUCT DRAFT ===');
       await this.saveProduct(formData);
       toast.success('Draft saved successfully!');
     } catch (error) {
       console.error('Error saving draft:', error);
-      toast.error('Error saving draft. Please try again.');
+      this.handleCreateError(error); // Use the enhanced error handler
     } finally {
       // Reset button state
       saveDraftButton.disabled = false;
@@ -555,13 +556,38 @@ export class CreateProduct {
       updatedAt: now
     };
 
-    // Save product to Firestore
-    const productDocRef = doc(db, 'products', this.currentUser.uid, 'sites', this.productSiteId, 'products', productId);
-    await setDoc(productDocRef, productData);
+    // Enhanced logging for debugging
+    console.log('=== PRODUCT CREATION DEBUG ===');
+    console.log('User ID:', this.currentUser.uid);
+    console.log('Product Site ID:', this.productSiteId);
+    console.log('Product ID:', productId);
+    console.log('Product Data:', productData);
+    console.log('Firestore Path:', `products/${this.currentUser.uid}/sites/${this.productSiteId}/products/${productId}`);
+    console.log('==============================');
+    try {
+      // Save product to Firestore
+      const productDocRef = doc(db, 'products', this.currentUser.uid, 'sites', this.productSiteId, 'products', productId);
+      console.log('Attempting to save product to Firestore...');
+      await setDoc(productDocRef, productData);
+      console.log('✅ Product saved successfully to Firestore');
+    } catch (firestoreError) {
+      console.error('❌ FIRESTORE SAVE ERROR:', firestoreError);
+      console.error('Error Code:', firestoreError.code);
+      console.error('Error Message:', firestoreError.message);
+      console.error('Full Error Object:', firestoreError);
+      throw firestoreError; // Re-throw to be caught by the calling function
+    }
 
-    // Update product site count if published
-    if (formData.status === 'published') {
-      await this.updateProductSiteCount(1);
+    try {
+      // Update product site count if published
+      if (formData.status === 'published') {
+        console.log('Updating product site count...');
+        await this.updateProductSiteCount(1);
+        console.log('✅ Product site count updated');
+      }
+    } catch (countError) {
+      console.error('❌ PRODUCT COUNT UPDATE ERROR:', countError);
+      // Don't throw this error as the product was saved successfully
     }
   }
 
@@ -715,12 +741,31 @@ export class CreateProduct {
   }
 
   handleCreateError(error) {
+    console.error('=== PRODUCT CREATION ERROR ===');
+    console.error('Error Object:', error);
+    console.error('Error Code:', error.code);
+    console.error('Error Message:', error.message);
+    console.error('Error Stack:', error.stack);
+    console.error('==============================');
+
     let message = 'An error occurred while creating the product. Please try again.';
 
     if (error.code === 'permission-denied') {
       message = 'Permission denied. Please check your account permissions.';
+      console.error('🔒 PERMISSION DENIED: Check Firestore security rules for products collection');
     } else if (error.code === 'network-request-failed') {
       message = 'Network error. Please check your connection and try again.';
+    } else if (error.code === 'invalid-argument') {
+      message = 'Invalid data provided. Please check your input and try again.';
+      console.error('📝 INVALID ARGUMENT: Check data structure and required fields');
+    } else if (error.code === 'not-found') {
+      message = 'Product site not found. Please refresh and try again.';
+      console.error('🔍 NOT FOUND: Product site or collection path may be incorrect');
+    } else if (error.code === 'unauthenticated') {
+      message = 'Authentication required. Please sign in again.';
+      console.error('🔐 UNAUTHENTICATED: User authentication may have expired');
+    } else {
+      console.error('🚨 UNKNOWN ERROR:', error.code, error.message);
     }
 
     toast.error(message);

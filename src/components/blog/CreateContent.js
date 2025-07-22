@@ -460,11 +460,12 @@ export class CreateContent {
     buttonLoading.style.display = 'inline';
 
     try {
+      console.log('=== SAVING DRAFT ===');
       await this.savePost(formData);
       toast.success('Draft saved successfully!');
     } catch (error) {
       console.error('Error saving draft:', error);
-      toast.error('Error saving draft. Please try again.');
+      this.handleCreateError(error); // Use the enhanced error handler
     } finally {
       // Reset button state
       saveDraftButton.disabled = false;
@@ -496,13 +497,38 @@ export class CreateContent {
       updatedAt: now
     };
 
-    // Save post to Firestore
-    const postDocRef = doc(db, 'content', this.currentUser.uid, 'blogs', this.blogSiteId, 'posts', postId);
-    await setDoc(postDocRef, postData);
+    // Enhanced logging for debugging
+    console.log('=== BLOG POST CREATION DEBUG ===');
+    console.log('User ID:', this.currentUser.uid);
+    console.log('Blog Site ID:', this.blogSiteId);
+    console.log('Post ID:', postId);
+    console.log('Post Data:', postData);
+    console.log('Firestore Path:', `content/${this.currentUser.uid}/blogs/${this.blogSiteId}/posts/${postId}`);
+    console.log('================================');
+    try {
+      // Save post to Firestore
+      const postDocRef = doc(db, 'content', this.currentUser.uid, 'blogs', this.blogSiteId, 'posts', postId);
+      console.log('Attempting to save post to Firestore...');
+      await setDoc(postDocRef, postData);
+      console.log('✅ Post saved successfully to Firestore');
+    } catch (firestoreError) {
+      console.error('❌ FIRESTORE SAVE ERROR:', firestoreError);
+      console.error('Error Code:', firestoreError.code);
+      console.error('Error Message:', firestoreError.message);
+      console.error('Full Error Object:', firestoreError);
+      throw firestoreError; // Re-throw to be caught by the calling function
+    }
 
-    // Update blog site post count if published
-    if (formData.status === 'published') {
-      await this.updateBlogSitePostCount(1);
+    try {
+      // Update blog site post count if published
+      if (formData.status === 'published') {
+        console.log('Updating blog site post count...');
+        await this.updateBlogSitePostCount(1);
+        console.log('✅ Blog site post count updated');
+      }
+    } catch (countError) {
+      console.error('❌ POST COUNT UPDATE ERROR:', countError);
+      // Don't throw this error as the post was saved successfully
     }
   }
 
@@ -638,12 +664,31 @@ export class CreateContent {
   }
 
   handleCreateError(error) {
+    console.error('=== BLOG POST CREATION ERROR ===');
+    console.error('Error Object:', error);
+    console.error('Error Code:', error.code);
+    console.error('Error Message:', error.message);
+    console.error('Error Stack:', error.stack);
+    console.error('================================');
+
     let message = 'An error occurred while creating the blog post. Please try again.';
 
     if (error.code === 'permission-denied') {
       message = 'Permission denied. Please check your account permissions.';
+      console.error('🔒 PERMISSION DENIED: Check Firestore security rules for content collection');
     } else if (error.code === 'network-request-failed') {
       message = 'Network error. Please check your connection and try again.';
+    } else if (error.code === 'invalid-argument') {
+      message = 'Invalid data provided. Please check your input and try again.';
+      console.error('📝 INVALID ARGUMENT: Check data structure and required fields');
+    } else if (error.code === 'not-found') {
+      message = 'Blog site not found. Please refresh and try again.';
+      console.error('🔍 NOT FOUND: Blog site or collection path may be incorrect');
+    } else if (error.code === 'unauthenticated') {
+      message = 'Authentication required. Please sign in again.';
+      console.error('🔐 UNAUTHENTICATED: User authentication may have expired');
+    } else {
+      console.error('🚨 UNKNOWN ERROR:', error.code, error.message);
     }
 
     toast.error(message);
