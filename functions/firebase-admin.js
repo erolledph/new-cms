@@ -122,33 +122,33 @@ function getParamsFromEvent(event, expectedParams) {
   
   // Determine API type and extract parameters accordingly
   if (path.includes('/api/content.json')) {
-    // Format: /{uid}/{blogId}/api/content.json
-    if (pathSegments.length >= 4 && pathSegments[2] === 'api' && pathSegments[3] === 'content.json') {
-      pathParams.uid = pathSegments[0];
-      pathParams.blogId = pathSegments[1];
+    // Format: /users/{uid}/blogs/{blogId}/api/content.json
+    if (pathSegments.length >= 6 && pathSegments[0] === 'users' && pathSegments[2] === 'blogs' && pathSegments[4] === 'api' && pathSegments[5] === 'content.json') {
+      pathParams.uid = pathSegments[1];
+      pathParams.blogId = pathSegments[3];
       console.log('Extracted content API parameters from path:', pathParams);
     }
   } else if (path.includes('/api/content/') && path.endsWith('.json')) {
-    // Format: /{uid}/{blogId}/api/content/{slug}.json
-    if (pathSegments.length >= 5 && pathSegments[2] === 'api' && pathSegments[3] === 'content') {
-      pathParams.uid = pathSegments[0];
-      pathParams.blogId = pathSegments[1];
-      pathParams.slug = pathSegments[4].replace('.json', '');
+    // Format: /users/{uid}/blogs/{blogId}/api/content/{slug}.json
+    if (pathSegments.length >= 7 && pathSegments[0] === 'users' && pathSegments[2] === 'blogs' && pathSegments[4] === 'api' && pathSegments[5] === 'content') {
+      pathParams.uid = pathSegments[1];
+      pathParams.blogId = pathSegments[3];
+      pathParams.slug = pathSegments[6].replace('.json', '');
       console.log('Extracted content-slug API parameters from path:', pathParams);
     }
   } else if (path.includes('/api/products.json')) {
-    // Format: /{uid}/{siteId}/api/products.json
-    if (pathSegments.length >= 4 && pathSegments[2] === 'api' && pathSegments[3] === 'products.json') {
-      pathParams.uid = pathSegments[0];
-      pathParams.siteId = pathSegments[1];
+    // Format: /users/{uid}/productSites/{siteId}/api/products.json
+    if (pathSegments.length >= 6 && pathSegments[0] === 'users' && pathSegments[2] === 'productSites' && pathSegments[4] === 'api' && pathSegments[5] === 'products.json') {
+      pathParams.uid = pathSegments[1];
+      pathParams.siteId = pathSegments[3];
       console.log('Extracted products API parameters from path:', pathParams);
     }
   } else if (path.includes('/api/products/') && path.endsWith('.json')) {
-    // Format: /{uid}/{siteId}/api/products/{slug}.json
-    if (pathSegments.length >= 5 && pathSegments[2] === 'api' && pathSegments[3] === 'products') {
-      pathParams.uid = pathSegments[0];
-      pathParams.siteId = pathSegments[1];
-      pathParams.slug = pathSegments[4].replace('.json', '');
+    // Format: /users/{uid}/productSites/{siteId}/api/products/{slug}.json
+    if (pathSegments.length >= 7 && pathSegments[0] === 'users' && pathSegments[2] === 'productSites' && pathSegments[4] === 'api' && pathSegments[5] === 'products') {
+      pathParams.uid = pathSegments[1];
+      pathParams.siteId = pathSegments[3];
+      pathParams.slug = pathSegments[6].replace('.json', '');
       console.log('Extracted products-slug API parameters from path:', pathParams);
     }
   }
