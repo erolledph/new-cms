@@ -90,6 +90,76 @@ function validateParams(params, required) {
   }
 }
 
+// Enhanced parameter extraction from event (query params or path)
+function getParamsFromEvent(event, expectedParams) {
+  console.log('=== PARAMETER EXTRACTION DEBUG ===');
+  console.log('Event path:', event.path);
+  console.log('Event queryStringParameters:', event.queryStringParameters);
+  console.log('Expected parameters:', expectedParams);
+  
+  // First, try to get parameters from queryStringParameters
+  const queryParams = event.queryStringParameters || {};
+  console.log('Query parameters found:', queryParams);
+  
+  // Check if we have all expected parameters from query string
+  const hasAllQueryParams = expectedParams.every(param => queryParams[param]);
+  
+  if (hasAllQueryParams) {
+    console.log('Using parameters from queryStringParameters');
+    console.log('=== PARAMETER EXTRACTION END ===');
+    return queryParams;
+  }
+  
+  // If query parameters are missing, parse from path
+  console.log('Query parameters incomplete, parsing from path...');
+  
+  const pathParams = {};
+  const path = event.path || '';
+  
+  // Remove leading slash and split by slash
+  const pathSegments = path.replace(/^\//, '').split('/');
+  console.log('Path segments:', pathSegments);
+  
+  // Determine API type and extract parameters accordingly
+  if (path.includes('/api/content.json')) {
+    // Format: /{uid}/{blogId}/api/content.json
+    if (pathSegments.length >= 4 && pathSegments[2] === 'api' && pathSegments[3] === 'content.json') {
+      pathParams.uid = pathSegments[0];
+      pathParams.blogId = pathSegments[1];
+      console.log('Extracted content API parameters from path:', pathParams);
+    }
+  } else if (path.includes('/api/content/') && path.endsWith('.json')) {
+    // Format: /{uid}/{blogId}/api/content/{slug}.json
+    if (pathSegments.length >= 5 && pathSegments[2] === 'api' && pathSegments[3] === 'content') {
+      pathParams.uid = pathSegments[0];
+      pathParams.blogId = pathSegments[1];
+      pathParams.slug = pathSegments[4].replace('.json', '');
+      console.log('Extracted content-slug API parameters from path:', pathParams);
+    }
+  } else if (path.includes('/api/products.json')) {
+    // Format: /{uid}/{siteId}/api/products.json
+    if (pathSegments.length >= 4 && pathSegments[2] === 'api' && pathSegments[3] === 'products.json') {
+      pathParams.uid = pathSegments[0];
+      pathParams.siteId = pathSegments[1];
+      console.log('Extracted products API parameters from path:', pathParams);
+    }
+  } else if (path.includes('/api/products/') && path.endsWith('.json')) {
+    // Format: /{uid}/{siteId}/api/products/{slug}.json
+    if (pathSegments.length >= 5 && pathSegments[2] === 'api' && pathSegments[3] === 'products') {
+      pathParams.uid = pathSegments[0];
+      pathParams.siteId = pathSegments[1];
+      pathParams.slug = pathSegments[4].replace('.json', '');
+      console.log('Extracted products-slug API parameters from path:', pathParams);
+    }
+  }
+  
+  // Merge query params with path params (path params take precedence)
+  const finalParams = { ...queryParams, ...pathParams };
+  console.log('Final extracted parameters:', finalParams);
+  console.log('=== PARAMETER EXTRACTION END ===');
+  
+  return finalParams;
+}
 module.exports = {
   initializeFirebaseAdmin,
   getFirestore,
@@ -97,5 +167,6 @@ module.exports = {
   handleCORS,
   errorResponse,
   successResponse,
-  validateParams
+  validateParams,
+  getParamsFromEvent
 };

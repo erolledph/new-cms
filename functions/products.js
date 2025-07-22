@@ -1,5 +1,5 @@
 // Products API Function - Serves all published products for a product site
-const { getFirestore, handleCORS, successResponse, errorResponse, validateParams } = require('./firebase-admin');
+const { getFirestore, handleCORS, successResponse, errorResponse, validateParams, getParamsFromEvent } = require('./firebase-admin');
 
 exports.handler = async (event, context) => {
   // Add detailed logging to diagnose parameter issues
@@ -21,11 +21,12 @@ exports.handler = async (event, context) => {
       return errorResponse(405, 'Method not allowed. Use GET to fetch products.');
     }
 
-    // Extract parameters from query string or path
-    const { uid, siteId } = event.queryStringParameters || {};
+    // Extract parameters using enhanced parameter extraction
+    const params = getParamsFromEvent(event, ['uid', 'siteId']);
+    const { uid, siteId } = params;
     
     // Log parameters for debugging
-    console.log('Products API - Query parameters:', event.queryStringParameters);
+    console.log('Products API - Extracted parameters:', params);
     console.log('Products API - Path:', event.path);
     
     // Validate required parameters

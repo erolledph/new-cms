@@ -1,5 +1,5 @@
 // Specific Content API Function - Serves a single published blog post by slug
-const { getFirestore, handleCORS, successResponse, errorResponse, validateParams } = require('./firebase-admin');
+const { getFirestore, handleCORS, successResponse, errorResponse, validateParams, getParamsFromEvent } = require('./firebase-admin');
 
 exports.handler = async (event, context) => {
   // Add detailed logging to diagnose parameter issues
@@ -21,11 +21,12 @@ exports.handler = async (event, context) => {
       return errorResponse(405, 'Method not allowed. Use GET to fetch content.');
     }
 
-    // Extract parameters from query string or path
-    const { uid, blogId, slug } = event.queryStringParameters || {};
+    // Extract parameters using enhanced parameter extraction
+    const params = getParamsFromEvent(event, ['uid', 'blogId', 'slug']);
+    const { uid, blogId, slug } = params;
     
     // Log parameters for debugging
-    console.log('Content Slug API - Query parameters:', event.queryStringParameters);
+    console.log('Content Slug API - Extracted parameters:', params);
     console.log('Content Slug API - Path:', event.path);
     
     // Validate required parameters

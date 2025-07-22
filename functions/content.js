@@ -1,5 +1,5 @@
 // Content API Function - Serves all published blog posts for a blog site
-const { getFirestore, handleCORS, successResponse, errorResponse, validateParams } = require('./firebase-admin');
+const { getFirestore, handleCORS, successResponse, errorResponse, validateParams, getParamsFromEvent } = require('./firebase-admin');
 
 exports.handler = async (event, context) => {
   // Add detailed logging to diagnose parameter issues
@@ -21,13 +21,13 @@ exports.handler = async (event, context) => {
       return errorResponse(405, 'Method not allowed. Use GET to fetch content.');
     }
 
-    // Extract parameters from query string or path
-    const { uid, blogId } = event.queryStringParameters || {};
+    // Extract parameters using enhanced parameter extraction
+    const params = getParamsFromEvent(event, ['uid', 'blogId']);
+    const { uid, blogId } = params;
     
     // Log parameters for debugging
-    console.log('Content API - Query parameters:', event.queryStringParameters);
+    console.log('Content API - Extracted parameters:', params);
     console.log('Content API - Path:', event.path);
-    console.log('Content API - Headers:', event.headers);
     
     // Validate required parameters
     try {

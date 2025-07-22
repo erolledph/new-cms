@@ -1,5 +1,5 @@
 // Specific Product API Function - Serves a single published product by slug
-const { getFirestore, handleCORS, successResponse, errorResponse, validateParams } = require('./firebase-admin');
+const { getFirestore, handleCORS, successResponse, errorResponse, validateParams, getParamsFromEvent } = require('./firebase-admin');
 
 exports.handler = async (event, context) => {
   // Add detailed logging to diagnose parameter issues
@@ -21,11 +21,12 @@ exports.handler = async (event, context) => {
       return errorResponse(405, 'Method not allowed. Use GET to fetch product.');
     }
 
-    // Extract parameters from query string or path
-    const { uid, siteId, slug } = event.queryStringParameters || {};
+    // Extract parameters using enhanced parameter extraction
+    const params = getParamsFromEvent(event, ['uid', 'siteId', 'slug']);
+    const { uid, siteId, slug } = params;
     
     // Log parameters for debugging
-    console.log('Product Slug API - Query parameters:', event.queryStringParameters);
+    console.log('Product Slug API - Extracted parameters:', params);
     console.log('Product Slug API - Path:', event.path);
     
     // Validate required parameters
