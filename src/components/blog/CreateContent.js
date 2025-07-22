@@ -508,6 +508,9 @@ export class CreateContent {
     try {
       // Save post to Firestore
       const postDocRef = doc(db, 'content', this.currentUser.uid, 'blogs', this.blogSiteId, 'posts', postId);
+      console.log('🔍 Constructed Firestore Document Reference Path:', postDocRef.path);
+      console.log('🔍 Document Reference ID:', postDocRef.id);
+      console.log('🔍 Document Reference Parent Path:', postDocRef.parent.path);
       console.log('Attempting to save post to Firestore...');
       await setDoc(postDocRef, postData);
       console.log('✅ Post saved successfully to Firestore');
