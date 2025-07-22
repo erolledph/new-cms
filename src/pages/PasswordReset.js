@@ -1,6 +1,7 @@
 // Password Reset page component
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../firebase.js';
+import { toast } from '../utils/toast.js';
 
 export class PasswordResetPage {
   constructor() {
@@ -76,9 +77,9 @@ export class PasswordResetPage {
       await sendPasswordResetEmail(auth, email);
       
       // Show success message
-      this.showMessage(
+      toast.success(
         'Password reset email sent! Please check your inbox and follow the instructions to reset your password.',
-        'success'
+        6000
       );
       
       // Optionally redirect to sign in after a delay
@@ -135,7 +136,7 @@ export class PasswordResetPage {
         break;
     }
 
-    this.showMessage(message, 'error');
+    toast.error(message);
   }
 
   showFieldError(fieldId, message) {
@@ -150,15 +151,5 @@ export class PasswordResetPage {
       element.style.display = 'none';
       element.textContent = '';
     });
-
-    const messageElement = this.element.querySelector('#reset-message');
-    messageElement.style.display = 'none';
-  }
-
-  showMessage(message, type) {
-    const messageElement = this.element.querySelector('#reset-message');
-    messageElement.textContent = message;
-    messageElement.className = `message ${type}`;
-    messageElement.style.display = 'block';
   }
 }

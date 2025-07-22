@@ -1,7 +1,7 @@
 // Authentication state management and routing
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth, db } from '../firebase.js';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 
 class AuthManager {
   constructor() {
@@ -39,7 +39,7 @@ class AuthManager {
         // Create user document
         await setDoc(userDocRef, {
           email: user.email,
-          createdAt: new Date(),
+          createdAt: serverTimestamp(),
           blogSites: [],
           productSites: [],
           plan: 'free'
@@ -54,8 +54,8 @@ class AuthManager {
         // Create userSettings document with default currency
         await setDoc(userSettingsRef, {
           currency: 'USD',
-          createdAt: new Date(),
-          updatedAt: new Date()
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
         });
       }
     } catch (error) {

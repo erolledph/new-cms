@@ -1,0 +1,39 @@
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+[functions]
+  directory = "functions"
+  node_bundler = "esbuild"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# Content API redirects
+[[redirects]]
+  from = "/:uid/:blogId/api/content.json"
+  to = "/.netlify/functions/content?uid=:uid&blogId=:blogId"
+  status = 200
+
+[[redirects]]
+  from = "/:uid/:blogId/api/content/:slug.json"
+  to = "/.netlify/functions/content-slug?uid=:uid&blogId=:blogId&slug=:slug"
+  status = 200
+
+# Products API redirects
+[[redirects]]
+  from = "/:uid/:siteId/api/products.json"
+  to = "/.netlify/functions/products?uid=:uid&siteId=:siteId"
+  status = 200
+
+[[redirects]]
+  from = "/:uid/:siteId/api/products/:slug.json"
+  to = "/.netlify/functions/products-slug?uid=:uid&siteId=:siteId&slug=:slug"
+  status = 200
+
+# Analytics API redirect
+[[redirects]]
+  from = "/api/analytics/track"
+  to = "/.netlify/functions/track-analytics"
+  status = 200
+  force = true

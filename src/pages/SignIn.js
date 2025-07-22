@@ -1,6 +1,7 @@
 // Sign In page component
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase.js';
+import { toast } from '../utils/toast.js';
 
 export class SignInPage {
   constructor() {
@@ -79,7 +80,7 @@ export class SignInPage {
       await signInWithEmailAndPassword(auth, email, password);
       
       // Show success message
-      this.showMessage('Signed in successfully! Redirecting...', 'success');
+      toast.success('Signed in successfully! Redirecting...');
       
       // Redirect will be handled by AuthManager
     } catch (error) {
@@ -146,7 +147,7 @@ export class SignInPage {
         break;
     }
 
-    this.showMessage(message, 'error');
+    toast.error(message);
   }
 
   showFieldError(fieldId, message) {
@@ -161,15 +162,5 @@ export class SignInPage {
       element.style.display = 'none';
       element.textContent = '';
     });
-
-    const messageElement = this.element.querySelector('#signin-message');
-    messageElement.style.display = 'none';
-  }
-
-  showMessage(message, type) {
-    const messageElement = this.element.querySelector('#signin-message');
-    messageElement.textContent = message;
-    messageElement.className = `message ${type}`;
-    messageElement.style.display = 'block';
   }
 }

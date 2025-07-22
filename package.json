@@ -6,7 +6,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "firebase": "^12.0.0",
+    "firebase": "^10.11.0",
+    "image-resize-compress": "^2.1.1",
     "servor": "^4.0.2"
   },
   "devDependencies": {

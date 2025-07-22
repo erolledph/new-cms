@@ -1,6 +1,7 @@
 // Sign Up page component
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase.js';
+import { toast } from '../utils/toast.js';
 
 export class SignUpPage {
   constructor() {
@@ -114,7 +115,7 @@ export class SignUpPage {
       await createUserWithEmailAndPassword(auth, email, password);
       
       // Show success message
-      this.showMessage('Account created successfully! Redirecting...', 'success');
+      toast.success('Account created successfully! Redirecting...');
       
       // Redirect will be handled by AuthManager
     } catch (error) {
@@ -184,7 +185,7 @@ export class SignUpPage {
         break;
     }
 
-    this.showMessage(message, 'error');
+    toast.error(message);
   }
 
   showFieldError(fieldId, message) {
@@ -199,15 +200,5 @@ export class SignUpPage {
       element.style.display = 'none';
       element.textContent = '';
     });
-
-    const messageElement = this.element.querySelector('#signup-message');
-    messageElement.style.display = 'none';
-  }
-
-  showMessage(message, type) {
-    const messageElement = this.element.querySelector('#signup-message');
-    messageElement.textContent = message;
-    messageElement.className = `message ${type}`;
-    messageElement.style.display = 'block';
   }
 }
