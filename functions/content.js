@@ -2,6 +2,15 @@
 const { getFirestore, handleCORS, successResponse, errorResponse, validateParams } = require('./firebase-admin');
 
 exports.handler = async (event, context) => {
+  // Add detailed logging to diagnose parameter issues
+  console.log('=== CONTENT FUNCTION DEBUG START ===');
+  console.log('Full event object received by content function:', JSON.stringify(event, null, 2));
+  console.log('Query string parameters received by content function:', event.queryStringParameters);
+  console.log('Event path:', event.path);
+  console.log('Event headers:', JSON.stringify(event.headers, null, 2));
+  console.log('Event httpMethod:', event.httpMethod);
+  console.log('=== CONTENT FUNCTION DEBUG END ===');
+
   try {
     // Handle CORS preflight requests
     const corsResponse = handleCORS(event);
