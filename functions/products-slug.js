@@ -41,9 +41,9 @@ exports.handler = async (event, context) => {
     const db = getFirestore();
 
     // Query for the specific product by slug
-    const productsRef = db.collection('products')
+    const productsRef = db.collection('users')
       .doc(uid)
-      .collection('sites')
+      .collection('productSites')
       .doc(siteId)
       .collection('products');
 

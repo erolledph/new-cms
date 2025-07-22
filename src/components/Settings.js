@@ -226,7 +226,7 @@ export class Settings {
 
     try {
       // Load user settings
-      const userSettingsRef = doc(db, 'userSettings', this.currentUser.uid);
+      const userSettingsRef = doc(db, 'users', this.currentUser.uid, 'settings', 'userSettingsDoc');
       const userSettingsDoc = await getDoc(userSettingsRef);
       
       if (userSettingsDoc.exists()) {
@@ -322,7 +322,7 @@ export class Settings {
       const formData = this.getFormData();
       
       // Update user settings in Firestore
-      const userSettingsRef = doc(db, 'userSettings', this.currentUser.uid);
+      const userSettingsRef = doc(db, 'users', this.currentUser.uid, 'settings', 'userSettingsDoc');
       await updateDoc(userSettingsRef, {
         ...formData,
         updatedAt: serverTimestamp()
@@ -358,7 +358,7 @@ export class Settings {
       const defaultSettings = this.getDefaultSettings();
       
       // Update user settings in Firestore
-      const userSettingsRef = doc(db, 'userSettings', this.currentUser.uid);
+      const userSettingsRef = doc(db, 'users', this.currentUser.uid, 'settings', 'userSettingsDoc');
       await updateDoc(userSettingsRef, {
         ...defaultSettings,
         updatedAt: serverTimestamp()

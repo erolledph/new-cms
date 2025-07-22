@@ -94,9 +94,9 @@ exports.handler = async (event, context) => {
     const eventId = generateEventId();
 
     // Store analytics data in Firestore
-    const analyticsRef = db.collection('analytics')
+    const analyticsRef = db.collection('users')
       .doc(uid)
-      .collection('sites')
+      .collection('analytics')
       .doc(siteId)
       .collection('events')
       .doc(eventId);

@@ -313,7 +313,7 @@ export class EditContent {
       }
 
       // Load post data
-      const postDocRef = doc(db, 'content', this.currentUser.uid, 'blogs', this.blogSiteId, 'posts', this.postId);
+      const postDocRef = doc(db, 'users', this.currentUser.uid, 'blogs', this.blogSiteId, 'posts', this.postId);
       const postDoc = await getDoc(postDocRef);
       
       if (postDoc.exists()) {
@@ -474,7 +474,7 @@ export class EditContent {
       categories: this.parseCommaSeparated(formData.categories),
       tags: this.parseCommaSeparated(formData.tags),
       status: formData.status,
-      contentUrl: `/${this.currentUser.uid}/${this.blogSiteId}/api/content/${formData.slug}.json`,
+      contentUrl: `/users/${this.currentUser.uid}/blogs/${this.blogSiteId}/api/content/${formData.slug}.json`,
       updatedAt: now
     };
 
@@ -484,7 +484,7 @@ export class EditContent {
     }
 
     // Update post in Firestore
-    const postDocRef = doc(db, 'content', this.currentUser.uid, 'blogs', this.blogSiteId, 'posts', this.postId);
+    const postDocRef = doc(db, 'users', this.currentUser.uid, 'blogs', this.blogSiteId, 'posts', this.postId);
     await updateDoc(postDocRef, updateData);
   }
 

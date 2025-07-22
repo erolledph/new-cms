@@ -199,7 +199,7 @@ export class ManageContent {
 
   async loadBlogPosts() {
     try {
-      const postsCollectionRef = collection(db, 'content', this.currentUser.uid, 'blogs', this.blogSiteId, 'posts');
+      const postsCollectionRef = collection(db, 'users', this.currentUser.uid, 'blogs', this.blogSiteId, 'posts');
       const postsQuery = query(postsCollectionRef, orderBy('createdAt', 'desc'));
       const postsSnapshot = await getDocs(postsQuery);
       
@@ -459,7 +459,7 @@ export class ManageContent {
     const newStatus = post.status === 'published' ? 'draft' : 'published';
     
     try {
-      const postDocRef = doc(db, 'content', this.currentUser.uid, 'blogs', this.blogSiteId, 'posts', postId);
+      const postDocRef = doc(db, 'users', this.currentUser.uid, 'blogs', this.blogSiteId, 'posts', postId);
       const updateData = {
         status: newStatus,
         updatedAt: new Date()
@@ -494,7 +494,7 @@ export class ManageContent {
     if (!confirmed) return;
 
     try {
-      const postDocRef = doc(db, 'content', this.currentUser.uid, 'blogs', this.blogSiteId, 'posts', postId);
+      const postDocRef = doc(db, 'users', this.currentUser.uid, 'blogs', this.blogSiteId, 'posts', postId);
       await deleteDoc(postDocRef);
 
       // Remove from local data
@@ -536,7 +536,7 @@ export class ManageContent {
 
     try {
       const promises = selectedPostIds.map(async (postId) => {
-        const postDocRef = doc(db, 'content', this.currentUser.uid, 'blogs', this.blogSiteId, 'posts', postId);
+        const postDocRef = doc(db, 'users', this.currentUser.uid, 'blogs', this.blogSiteId, 'posts', postId);
         
         if (action === 'delete') {
           await deleteDoc(postDocRef);

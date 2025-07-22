@@ -136,12 +136,12 @@ export class Analytics {
       this.populateSiteSelector();
 
       // Fetch all analytics events for the user
-      const analyticsCollectionRef = collection(db, 'analytics', this.currentUser.uid, 'sites');
+      const analyticsCollectionRef = collection(db, 'users', this.currentUser.uid, 'analytics');
       const siteSnapshots = await getDocs(analyticsCollectionRef);
 
       let allEvents = [];
       for (const siteDoc of siteSnapshots.docs) {
-        const eventsCollectionRef = collection(db, 'analytics', this.currentUser.uid, 'sites', siteDoc.id, 'events');
+        const eventsCollectionRef = collection(db, 'users', this.currentUser.uid, 'analytics', siteDoc.id, 'events');
         const eventsSnapshot = await getDocs(eventsCollectionRef);
         eventsSnapshot.forEach(eventDoc => {
           allEvents.push({ siteId: siteDoc.id, ...eventDoc.data() });

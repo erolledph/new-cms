@@ -211,7 +211,7 @@ export class ManageProducts {
 
   async loadProducts() {
     try {
-      const productsCollectionRef = collection(db, 'products', this.currentUser.uid, 'sites', this.productSiteId, 'products');
+      const productsCollectionRef = collection(db, 'users', this.currentUser.uid, 'productSites', this.productSiteId, 'products');
       const productsQuery = query(productsCollectionRef, orderBy('createdAt', 'desc'));
       const productsSnapshot = await getDocs(productsQuery);
       
@@ -505,7 +505,7 @@ export class ManageProducts {
     const newStatus = product.status === 'published' ? 'draft' : 'published';
     
     try {
-      const productDocRef = doc(db, 'products', this.currentUser.uid, 'sites', this.productSiteId, 'products', productId);
+      const productDocRef = doc(db, 'users', this.currentUser.uid, 'productSites', this.productSiteId, 'products', productId);
       const updateData = {
         status: newStatus,
         updatedAt: new Date()
@@ -536,7 +536,7 @@ export class ManageProducts {
     if (!confirmed) return;
 
     try {
-      const productDocRef = doc(db, 'products', this.currentUser.uid, 'sites', this.productSiteId, 'products', productId);
+      const productDocRef = doc(db, 'users', this.currentUser.uid, 'productSites', this.productSiteId, 'products', productId);
       await deleteDoc(productDocRef);
 
       // Remove from local data
@@ -581,7 +581,7 @@ export class ManageProducts {
 
     try {
       const promises = selectedProductIds.map(async (productId) => {
-        const productDocRef = doc(db, 'products', this.currentUser.uid, 'sites', this.productSiteId, 'products', productId);
+        const productDocRef = doc(db, 'users', this.currentUser.uid, 'productSites', this.productSiteId, 'products', productId);
         
         if (action === 'delete') {
           await deleteDoc(productDocRef);

@@ -491,7 +491,7 @@ export class CreateContent {
       categories: this.parseCommaSeparated(formData.categories),
       tags: this.parseCommaSeparated(formData.tags),
       status: formData.status,
-      contentUrl: `/${this.currentUser.uid}/${this.blogSiteId}/api/content/${formData.slug}.json`,
+      contentUrl: `/users/${this.currentUser.uid}/blogs/${this.blogSiteId}/api/content/${formData.slug}.json`,
       publishDate: formData.status === 'published' ? now : null,
       createdAt: now,
       updatedAt: now
@@ -507,7 +507,7 @@ export class CreateContent {
     console.log('================================');
     try {
       // Save post to Firestore
-      const postDocRef = doc(db, 'content', this.currentUser.uid, 'blogs', this.blogSiteId, 'posts', postId);
+      const postDocRef = doc(db, 'users', this.currentUser.uid, 'blogs', this.blogSiteId, 'posts', postId);
       console.log('🔍 Constructed Firestore Document Reference Path:', postDocRef.path);
       console.log('🔍 Document Reference ID:', postDocRef.id);
       console.log('🔍 Document Reference Parent Path:', postDocRef.parent.path);

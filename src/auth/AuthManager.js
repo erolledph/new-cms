@@ -47,7 +47,7 @@ class AuthManager {
       }
 
       // Check if userSettings document exists
-      const userSettingsRef = doc(db, 'userSettings', user.uid);
+      const userSettingsRef = doc(db, 'users', user.uid, 'settings', 'userSettingsDoc');
       const userSettingsDoc = await getDoc(userSettingsRef);
       
       if (!userSettingsDoc.exists()) {

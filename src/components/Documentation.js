@@ -42,7 +42,7 @@ export class Documentation {
             <div class="api-endpoint">
               <h4>Get All Posts</h4>
               <div class="endpoint-url">
-                <code>GET /{uid}/{blogId}/api/content.json</code>
+                <code>GET /users/{uid}/blogs/{blogId}/api/content.json</code>
               </div>
               <p><strong>Description:</strong> Returns all published blog posts for a specific blog site, ordered by publication date (newest first).</p>
               
@@ -62,7 +62,7 @@ export class Documentation {
       "author": "Author Name",
       "categories": ["Technology", "Web Development"],
       "tags": ["javascript", "tutorial"],
-      "contentUrl": "/{uid}/{blogId}/api/content/my-blog-post-title.json",
+      "contentUrl": "/users/{uid}/blogs/{blogId}/api/content/my-blog-post-title.json",
       "publishDate": "2024-01-15T10:30:00.000Z",
       "createdAt": "2024-01-15T09:00:00.000Z",
       "updatedAt": "2024-01-15T10:30:00.000Z"
@@ -79,7 +79,7 @@ export class Documentation {
             <div class="api-endpoint">
               <h4>Get Single Post</h4>
               <div class="endpoint-url">
-                <code>GET /{uid}/{blogId}/api/content/{slug}.json</code>
+                <code>GET /users/{uid}/blogs/{blogId}/api/content/{slug}.json</code>
               </div>
               <p><strong>Description:</strong> Returns a specific published blog post by its slug.</p>
               
@@ -98,7 +98,7 @@ export class Documentation {
     "author": "Author Name",
     "categories": ["Technology"],
     "tags": ["javascript"],
-    "contentUrl": "/{uid}/{blogId}/api/content/my-blog-post-title.json",
+    "contentUrl": "/users/{uid}/blogs/{blogId}/api/content/my-blog-post-title.json",
     "publishDate": "2024-01-15T10:30:00.000Z",
     "createdAt": "2024-01-15T09:00:00.000Z",
     "updatedAt": "2024-01-15T10:30:00.000Z"
@@ -122,7 +122,7 @@ export class Documentation {
             <div class="api-endpoint">
               <h4>Get All Products</h4>
               <div class="endpoint-url">
-                <code>GET /{uid}/{siteId}/api/products.json</code>
+                <code>GET /users/{uid}/productSites/{siteId}/api/products.json</code>
               </div>
               <p><strong>Description:</strong> Returns all published products for a specific product site, ordered by creation date (newest first).</p>
               
@@ -161,7 +161,7 @@ export class Documentation {
             <div class="api-endpoint">
               <h4>Get Single Product</h4>
               <div class="endpoint-url">
-                <code>GET /{uid}/{siteId}/api/products/{slug}.json</code>
+                <code>GET /users/{uid}/productSites/{siteId}/api/products/{slug}.json</code>
               </div>
               <p><strong>Description:</strong> Returns a specific published product by its slug.</p>
               
@@ -250,7 +250,7 @@ export class Documentation {
 const uid = 'your-actual-uid';
 const blogId = 'your-actual-blog-id';
 
-fetch('/' + uid + '/' + blogId + '/api/content.json')
+fetch('/users/' + uid + '/blogs/' + blogId + '/api/content.json')
   .then(response => response.json())
   .then(data => {
     console.log('Blog posts:', data.posts);
@@ -264,7 +264,7 @@ fetch('/' + uid + '/' + blogId + '/api/content.json')
 // Replace {uid} and {siteId} with actual values
 const productSiteId = 'your-actual-site-id';
 
-fetch('/' + uid + '/' + productSiteId + '/api/products.json')
+fetch('/users/' + uid + '/productSites/' + productSiteId + '/api/products.json')
   .then(response => response.json())
   .then(data => {
     console.log('Products:', data.products);
@@ -308,7 +308,7 @@ function BlogPosts() {
   const blogId = 'your-actual-blog-id';
 
   useEffect(() => {
-    fetch('/' + uid + '/' + blogId + '/api/content.json')
+    fetch('/users/' + uid + '/blogs/' + blogId + '/api/content.json')
       .then(response => response.json())
       .then(data => {
         setPosts(data.posts);
@@ -344,7 +344,7 @@ $uid = 'your-actual-uid';
 $blogId = 'your-actual-blog-id';
 
 // Fetch blog posts
-$url = "/" . $uid . "/" . $blogId . "/api/content.json";
+$url = "/users/" . $uid . "/blogs/" . $blogId . "/api/content.json";
 $response = file_get_contents($url);
 $data = json_decode($response, true);
 
@@ -370,7 +370,7 @@ uid = 'your-actual-uid'
 site_id = 'your-actual-site-id'
 
 # Fetch products
-url = '/' + uid + '/' + site_id + '/api/products.json'
+url = '/users/' + uid + '/productSites/' + site_id + '/api/products.json'
 response = requests.get(url)
 
 if response.status_code == 200:
@@ -518,15 +518,15 @@ print(f"Analytics tracked: {analytics_response.json()}")</code></pre>
             <div class="example-urls">
               <div class="example-url">
                 <strong>All Posts:</strong>
-                <code class="copyable" data-url="${'/' + this.currentUser.uid + '/' + site.id + '/api/content.json'}">
-                  ${'/' + this.currentUser.uid + '/' + site.id + '/api/content.json'}
+                <code class="copyable" data-url="${'/users/' + this.currentUser.uid + '/blogs/' + site.id + '/api/content.json'}">
+                  ${'/users/' + this.currentUser.uid + '/blogs/' + site.id + '/api/content.json'}
                 </code>
                 <button class="copy-button" onclick="this.parentElement.querySelector('.copyable').select(); document.execCommand('copy'); this.textContent='Copied!'; setTimeout(() => this.textContent='Copy', 2000)">Copy</button>
               </div>
               <div class="example-url">
                 <strong>Single Post:</strong>
-                <code class="copyable" data-url="${'/' + this.currentUser.uid + '/' + site.id + '/api/content/{slug}.json'}">
-                  ${'/' + this.currentUser.uid + '/' + site.id + '/api/content/{slug}.json'}
+                <code class="copyable" data-url="${'/users/' + this.currentUser.uid + '/blogs/' + site.id + '/api/content/{slug}.json'}">
+                  ${'/users/' + this.currentUser.uid + '/blogs/' + site.id + '/api/content/{slug}.json'}
                 </code>
                 <button class="copy-button" onclick="this.parentElement.querySelector('.copyable').select(); document.execCommand('copy'); this.textContent='Copied!'; setTimeout(() => this.textContent='Copy', 2000)">Copy</button>
               </div>
@@ -553,15 +553,15 @@ print(f"Analytics tracked: {analytics_response.json()}")</code></pre>
             <div class="example-urls">
               <div class="example-url">
                 <strong>All Products:</strong>
-                <code class="copyable" data-url="${'/' + this.currentUser.uid + '/' + site.id + '/api/products.json'}">
-                  ${'/' + this.currentUser.uid + '/' + site.id + '/api/products.json'}
+                <code class="copyable" data-url="${'/users/' + this.currentUser.uid + '/productSites/' + site.id + '/api/products.json'}">
+                  ${'/users/' + this.currentUser.uid + '/productSites/' + site.id + '/api/products.json'}
                 </code>
                 <button class="copy-button" onclick="this.parentElement.querySelector('.copyable').select(); document.execCommand('copy'); this.textContent='Copied!'; setTimeout(() => this.textContent='Copy', 2000)">Copy</button>
               </div>
               <div class="example-url">
                 <strong>Single Product:</strong>
-                <code class="copyable" data-url="${'/' + this.currentUser.uid + '/' + site.id + '/api/products/{slug}.json'}">
-                  ${'/' + this.currentUser.uid + '/' + site.id + '/api/products/{slug}.json'}
+                <code class="copyable" data-url="${'/users/' + this.currentUser.uid + '/productSites/' + site.id + '/api/products/{slug}.json'}">
+                  ${'/users/' + this.currentUser.uid + '/productSites/' + site.id + '/api/products/{slug}.json'}
                 </code>
                 <button class="copy-button" onclick="this.parentElement.querySelector('.copyable').select(); document.execCommand('copy'); this.textContent='Copied!'; setTimeout(() => this.textContent='Copy', 2000)">Copy</button>
               </div>

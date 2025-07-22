@@ -462,7 +462,7 @@ export class ManageBlogSites {
   async deleteAllBlogPosts() {
     try {
       // Get all posts for this blog site
-      const postsCollectionRef = collection(db, 'content', this.currentUser.uid, 'blogs', this.blogSiteId, 'posts');
+      const postsCollectionRef = collection(db, 'users', this.currentUser.uid, 'blogs', this.blogSiteId, 'posts');
       const postsSnapshot = await getDocs(postsCollectionRef);
 
       if (postsSnapshot.empty) {

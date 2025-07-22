@@ -22,78 +22,88 @@ service cloud.firestore {
       allow update: if request.auth.uid == userId &&
                        (request.resource.data.blogSites == null || request.resource.data.blogSites.size() <= 3) &&
                        (request.resource.data.productSites == null || request.resource.data.productSites.size() <= 3);
-    }
 
-    // UserSettings collection rules
-    match /userSettings/{userId} {
-      // Allow read, update, delete only if the user is the owner
-      allow read, update, delete: if request.auth.uid == userId;
 
-      // Allow create only if the user is the owner and initial data is correct
-      allow create: if request.auth.uid == userId &&
-                       request.resource.data.createdAt is timestamp &&
-                       request.resource.data.updatedAt is timestamp;
-    }
 
-    // Files collection rules
-    match /users/{userId}/files/{fileId} {
-      // Allow read, create, update, delete only if the user is the owner
-      allow read, create, update, delete: if request.auth.uid == userId;
-    }
 
-    // Blog Content collection rules
-    match /content/{userId}/blogs/{blogId}/posts/{postId} {
-      // Allow read, write, update, delete only if the user is the owner
-      allow read, write, update, delete: if request.auth.uid == userId;
 
-      // Validate required fields for create operations
-      allow create: if request.auth.uid == userId &&
-                       request.resource.data.title is string &&
-                       request.resource.data.slug is string &&
-                       request.resource.data.content is string &&
-                       request.resource.data.status in ['draft', 'published'] &&
-                       request.resource.data.createdAt is timestamp &&
-                       request.resource.data.updatedAt is timestamp &&
-                       request.resource.data.author is string;
 
-      // Validate required fields for update operations
-      allow update: if request.auth.uid == userId &&
-                       (request.resource.data.title == null || request.resource.data.title is string) &&
-                       (request.resource.data.slug == null || request.resource.data.slug is string) &&
-                       (request.resource.data.content == null || request.resource.data.content is string) &&
-                       (request.resource.data.status == null || request.resource.data.status in ['draft', 'published']) &&
-                       request.resource.data.updatedAt is timestamp;
-    }
 
-    // Product Content collection rules
-    match /products/{userId}/sites/{siteId}/products/{productId} {
-      // Allow read, write, update, delete only if the user is the owner
-      allow read, write, update, delete: if request.auth.uid == userId;
 
-      // Validate required fields for create operations
-      allow create: if request.auth.uid == userId &&
-                       request.resource.data.name is string &&
-                       request.resource.data.slug is string &&
-                       request.resource.data.price is number &&
-                       request.resource.data.currency is string &&
-                       request.resource.data.status in ['draft', 'published'] &&
-                       request.resource.data.createdAt is timestamp &&
-                       request.resource.data.updatedAt is timestamp;
 
-      // Validate required fields for update operations
-      allow update: if request.auth.uid == userId &&
-                       (request.resource.data.name == null || request.resource.data.name is string) &&
-                       (request.resource.data.slug == null || request.resource.data.slug is string) &&
-                       (request.resource.data.price == null || request.resource.data.price is number) &&
-                       (request.resource.data.currency == null || request.resource.data.currency is string) &&
-                       (request.resource.data.status == null || request.resource.data.status in ['draft', 'published']) &&
-                       request.resource.data.updatedAt is timestamp;
-    }
 
-    // Analytics collection rules
-    match /analytics/{userId}/sites/{siteId}/events/{eventId} {
-      // Allow read, write, update, delete only if the user is the owner
-      allow read, write, update, delete: if request.auth.uid == userId;
+      
+      // UserSettings subcollection rules
+      match /settings/{document=**} {
+        // Allow read, update, delete only if the user is the owner
+        allow read, update, delete: if request.auth.uid == userId;
+
+        // Allow create only if the user is the owner and initial data is correct
+        allow create: if request.auth.uid == userId &&
+                         request.resource.data.createdAt is timestamp &&
+                         request.resource.data.updatedAt is timestamp;
+      }
+
+      // Files subcollection rules
+      match /files/{fileId} {
+        // Allow read, create, update, delete only if the user is the owner
+        allow read, create, update, delete: if request.auth.uid == userId;
+      }
+
+      // Blog Content subcollection rules
+      match /blogs/{blogId}/posts/{postId} {
+        // Allow read, write, update, delete only if the user is the owner
+        allow read, write, update, delete: if request.auth.uid == userId;
+
+        // Validate required fields for create operations
+        allow create: if request.auth.uid == userId &&
+                         request.resource.data.title is string &&
+                         request.resource.data.slug is string &&
+                         request.resource.data.content is string &&
+                         request.resource.data.status in ['draft', 'published'] &&
+                         request.resource.data.createdAt is timestamp &&
+                         request.resource.data.updatedAt is timestamp &&
+                         request.resource.data.author is string;
+
+        // Validate required fields for update operations
+        allow update: if request.auth.uid == userId &&
+                         (request.resource.data.title == null || request.resource.data.title is string) &&
+                         (request.resource.data.slug == null || request.resource.data.slug is string) &&
+                         (request.resource.data.content == null || request.resource.data.content is string) &&
+                         (request.resource.data.status == null || request.resource.data.status in ['draft', 'published']) &&
+                         request.resource.data.updatedAt is timestamp;
+      }
+
+      // Product Content subcollection rules
+      match /productSites/{siteId}/products/{productId} {
+        // Allow read, write, update, delete only if the user is the owner
+        allow read, write, update, delete: if request.auth.uid == userId;
+
+        // Validate required fields for create operations
+        allow create: if request.auth.uid == userId &&
+                         request.resource.data.name is string &&
+                         request.resource.data.slug is string &&
+                         request.resource.data.price is number &&
+                         request.resource.data.currency is string &&
+                         request.resource.data.status in ['draft', 'published'] &&
+                         request.resource.data.createdAt is timestamp &&
+                         request.resource.data.updatedAt is timestamp;
+
+        // Validate required fields for update operations
+        allow update: if request.auth.uid == userId &&
+                         (request.resource.data.name == null || request.resource.data.name is string) &&
+                         (request.resource.data.slug == null || request.resource.data.slug is string) &&
+                         (request.resource.data.price == null || request.resource.data.price is number) &&
+                         (request.resource.data.currency == null || request.resource.data.currency is string) &&
+                         (request.resource.data.status == null || request.resource.data.status in ['draft', 'published']) &&
+                         request.resource.data.updatedAt is timestamp;
+      }
+
+      // Analytics subcollection rules
+      match /analytics/{siteId}/events/{eventId} {
+        // Allow read, write, update, delete only if the user is the owner
+        allow read, write, update, delete: if request.auth.uid == userId;
+      }
     }
   }
 }

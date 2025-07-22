@@ -340,7 +340,7 @@ export class EditProduct {
       }
 
       // Load product data
-      const productDocRef = doc(db, 'products', this.currentUser.uid, 'sites', this.productSiteId, 'products', this.productId);
+      const productDocRef = doc(db, 'users', this.currentUser.uid, 'productSites', this.productSiteId, 'products', this.productId);
       const productDoc = await getDoc(productDocRef);
       
       if (productDoc.exists()) {
@@ -539,7 +539,7 @@ export class EditProduct {
     };
 
     // Update product in Firestore
-    const productDocRef = doc(db, 'products', this.currentUser.uid, 'sites', this.productSiteId, 'products', this.productId);
+    const productDocRef = doc(db, 'users', this.currentUser.uid, 'productSites', this.productSiteId, 'products', this.productId);
     await updateDoc(productDocRef, updateData);
   }
 

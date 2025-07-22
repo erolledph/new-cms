@@ -497,7 +497,7 @@ export class ManageProductSites {
   async deleteAllProducts() {
     try {
       // Get all products for this product site
-      const productsCollectionRef = collection(db, 'products', this.currentUser.uid, 'sites', this.productSiteId, 'products');
+      const productsCollectionRef = collection(db, 'users', this.currentUser.uid, 'productSites', this.productSiteId, 'products');
       const productsSnapshot = await getDocs(productsCollectionRef);
 
       if (productsSnapshot.empty) {

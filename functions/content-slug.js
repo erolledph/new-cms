@@ -41,7 +41,7 @@ exports.handler = async (event, context) => {
     const db = getFirestore();
 
     // Query for the specific post by slug
-    const postsRef = db.collection('content')
+    const postsRef = db.collection('users')
       .doc(uid)
       .collection('blogs')
       .doc(blogId)

@@ -272,12 +272,12 @@ export class SiteSettings {
       endpoints = [
         {
           label: 'All Posts',
-          url: `/${this.currentUser.uid}/${this.siteId}/api/content.json`,
+          url: `/users/${this.currentUser.uid}/blogs/${this.siteId}/api/content.json`,
           description: 'Returns all published blog posts'
         },
         {
           label: 'Single Post',
-          url: `/${this.currentUser.uid}/${this.siteId}/api/content/{slug}.json`,
+          url: `/users/${this.currentUser.uid}/blogs/${this.siteId}/api/content/{slug}.json`,
           description: 'Returns a specific post by slug'
         }
       ];
@@ -285,12 +285,12 @@ export class SiteSettings {
       endpoints = [
         {
           label: 'All Products',
-          url: `/${this.currentUser.uid}/${this.siteId}/api/products.json`,
+          url: `/users/${this.currentUser.uid}/productSites/${this.siteId}/api/products.json`,
           description: 'Returns all published products'
         },
         {
           label: 'Single Product',
-          url: `/${this.currentUser.uid}/${this.siteId}/api/products/{slug}.json`,
+          url: `/users/${this.currentUser.uid}/productSites/${this.siteId}/api/products/{slug}.json`,
           description: 'Returns a specific product by slug'
         }
       ];

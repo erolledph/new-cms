@@ -566,7 +566,7 @@ export class CreateProduct {
     console.log('==============================');
     try {
       // Save product to Firestore
-      const productDocRef = doc(db, 'products', this.currentUser.uid, 'sites', this.productSiteId, 'products', productId);
+      const productDocRef = doc(db, 'users', this.currentUser.uid, 'productSites', this.productSiteId, 'products', productId);
       console.log('🔍 Constructed Firestore Document Reference Path:', productDocRef.path);
       console.log('🔍 Document Reference ID:', productDocRef.id);
       console.log('🔍 Document Reference Parent Path:', productDocRef.parent.path);
