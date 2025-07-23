@@ -332,7 +332,7 @@ export class EditProduct {
       }
 
       // Load user settings for default currency
-      const userSettingsRef = doc(db, 'userSettings', this.currentUser.uid);
+      const userSettingsRef = doc(db, 'users', this.currentUser.uid, 'settings', 'userSettingsDoc');
       const userSettingsDoc = await getDoc(userSettingsRef);
       
       if (userSettingsDoc.exists()) {
@@ -745,15 +745,16 @@ export class EditProduct {
 
     // File selection handler
     modal.addEventListener('click', (e) => {
-      if (e.target.classList.contains('modal-file-item')) {
+      const fileItem = e.target.closest('.modal-file-item');
+      if (fileItem) {
         // Remove previous selection
         modal.querySelectorAll('.modal-file-item').forEach(item => {
           item.classList.remove('selected');
         });
         
         // Add selection to clicked item
-        e.target.classList.add('selected');
-        selectedFileUrl = e.target.dataset.fileUrl;
+        fileItem.classList.add('selected');
+        selectedFileUrl = fileItem.dataset.fileUrl;
         selectButton.disabled = false;
       }
     });

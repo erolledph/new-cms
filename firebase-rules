@@ -100,6 +100,11 @@ service cloud.firestore {
       }
 
       // Analytics subcollection rules
+      match /analytics/{siteId} {
+        // Allow read access to analytics sites for the user
+        allow read: if request.auth.uid == userId;
+      }
+
       match /analytics/{siteId}/events/{eventId} {
         // Allow read, write, update, delete only if the user is the owner
         allow read, write, update, delete: if request.auth.uid == userId;
