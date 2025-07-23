@@ -149,35 +149,23 @@ export class CreateProduct {
             
             <div class="images-section">
               <h3>Product Images</h3>
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="main-image">Main Image URL</label>
-                  <input 
-                    type="url" 
-                    id="main-image" 
-                    name="mainImage" 
-                    placeholder="https://example.com/image.jpg"
-                  >
-                  <button type="button" class="file-select-button" id="select-main-image">
-                    SELECT from Files
-                  </button>
-                </div>
-                
-                <div class="form-group">
-                  <label for="gallery-images">Gallery Images (URLs)</label>
-                  <textarea 
-                    id="gallery-images" 
-                    name="galleryImages" 
-                    placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg&#10;https://example.com/image3.jpg"
-                    rows="4"
-                  ></textarea>
-                  <small class="field-help">Enter one URL per line for additional product images</small>
+              <p class="section-description">Select up to 5 images for your product. The first image will be used as the main product image.</p>
+              
+              <div class="form-group">
+                <label>Selected Images</label>
+                <div class="selected-images-preview" id="selected-images-preview">
+                  <div class="no-images-selected">
+                    <p>No images selected yet.</p>
+                    <button type="button" class="file-select-button" id="select-images-button">
+                      <i class="fas fa-images"></i>
+                      Select Images (up to 5)
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
             
             <div class="product-details-section">
-              <h3>Product Details</h3>
               <div class="form-row">
                 <div class="form-group">
                   <label for="product-url">Product URL</label>
@@ -258,7 +246,7 @@ export class CreateProduct {
     const currencySelect = this.element.querySelector('#currency-select');
     const cancelButton = this.element.querySelector('#cancel-button');
     const saveDraftButton = this.element.querySelector('#save-draft-button');
-    const selectMainImageButton = this.element.querySelector('#select-main-image');
+    const selectImagesButton = this.element.querySelector('#select-images-button');
 
     // Navigation
     backButton.addEventListener('click', () => {
@@ -302,7 +290,7 @@ export class CreateProduct {
     saveDraftButton.addEventListener('click', () => this.handleSaveDraft());
 
     // File selection
-    selectMainImageButton.addEventListener('click', () => this.openFileSelectionModal());
+    selectImagesButton.addEventListener('click', () => this.openFileSelectionModal());
 
     // Real-time validation
     nameInput.addEventListener('blur', () => this.validateProductName());
@@ -365,6 +353,14 @@ export class CreateProduct {
     
     this.updateCurrencySymbol(defaultCurrency);
     this.updatePricingPreview();
+    
+    // Initialize selected images array
+    this.selectedImageUrls = [];
+    
+    // Listen for file selection events
+    window.addEventListener('files-selected', (e) => {
+      this.handleFilesSelected(e.detail.files);
+    });
   }
 
   generateSlug(text) {
@@ -524,10 +520,9 @@ export class CreateProduct {
     const finalPrice = originalPrice - discountAmount;
     
     // Parse gallery images
-    const galleryImages = formData.galleryImages
-      .split('\n')
-      .map(url => url.trim())
-      .filter(url => url.length > 0);
+    const allImages = this.selectedImageUrls || [];
+    const mainImage = allImages.length > 0 ? allImages[0] : '';
+    const galleryImages = allImages.length > 1 ? allImages.slice(1) : [];
     
     // Parse tags
     const tags = formData.tags
@@ -546,7 +541,7 @@ export class CreateProduct {
       discountedPrice: finalPrice,
       savings: discountAmount,
       currency: formData.currency,
-      imageUrl: formData.mainImage || '',
+      imageUrl: mainImage,
       imageUrls: galleryImages,
       productUrl: formData.productUrl || '',
       category: formData.category || '',
@@ -634,8 +629,6 @@ export class CreateProduct {
       originalPrice: this.element.querySelector('#original-price').value.trim(),
       discountPercent: this.element.querySelector('#discount-percent').value.trim(),
       currency: this.element.querySelector('#currency-select').value,
-      mainImage: this.element.querySelector('#main-image').value.trim(),
-      galleryImages: this.element.querySelector('#gallery-images').value.trim(),
       productUrl: this.element.querySelector('#product-url').value.trim(),
       category: this.element.querySelector('#product-category').value.trim(),
       tags: this.element.querySelector('#product-tags').value.trim(),
@@ -774,7 +767,79 @@ export class CreateProduct {
     toast.error(message);
   }
 
+  handleFilesSelected(files) {
+    this.selectedImageUrls = files.map(file => file.downloadURL);
+    this.renderSelectedImages();
+  }
+
+  renderSelectedImages() {
+    const previewContainer = this.element.querySelector('#selected-images-preview');
+    
+    if (this.selectedImageUrls.length === 0) {
+      previewContainer.innerHTML = `
+        <div class="no-images-selected">
+          <p>No images selected yet.</p>
+          <button type="button" class="file-select-button" id="select-images-button">
+            <i class="fas fa-images"></i>
+            Select Images (up to 5)
+          </button>
+        </div>
+      `;
+      
+      // Re-attach event listener
+      const selectImagesButton = previewContainer.querySelector('#select-images-button');
+      selectImagesButton.addEventListener('click', () => this.openFileSelectionModal());
+      return;
+    }
+
+    const imagesHTML = this.selectedImageUrls.map((url, index) => `
+      <div class="selected-image-item" data-index="${index}">
+        <img src="${url}" alt="Product image ${index + 1}" />
+        <button type="button" class="remove-image-button" data-index="${index}">
+          <i class="fas fa-times"></i>
+        </button>
+        ${index === 0 ? '<div class="main-image-badge">Main</div>' : ''}
+      </div>
+    `).join('');
+
+    previewContainer.innerHTML = `
+      ${imagesHTML}
+      ${this.selectedImageUrls.length < 5 ? `
+        <div class="add-more-images">
+          <button type="button" class="file-select-button" id="add-more-images-button">
+            <i class="fas fa-plus"></i>
+            Add More (${5 - this.selectedImageUrls.length} remaining)
+          </button>
+        </div>
+      ` : ''}
+    `;
+
+    // Attach event listeners
+    const removeButtons = previewContainer.querySelectorAll('.remove-image-button');
+    removeButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        const index = parseInt(e.target.closest('.remove-image-button').dataset.index);
+        this.removeImage(index);
+      });
+    });
+
+    const addMoreButton = previewContainer.querySelector('#add-more-images-button');
+    if (addMoreButton) {
+      addMoreButton.addEventListener('click', () => this.openFileSelectionModal());
+    }
+  }
+
+  removeImage(index) {
+    this.selectedImageUrls.splice(index, 1);
+    this.renderSelectedImages();
+  }
   openFileSelectionModal() {
+    const maxFiles = 5 - this.selectedImageUrls.length;
+    if (maxFiles <= 0) {
+      toast.warning('You can only select up to 5 images per product.');
+      return;
+    }
+
     // Create modal overlay
     const modal = document.createElement('div');
     modal.className = 'file-selection-modal';
@@ -782,7 +847,8 @@ export class CreateProduct {
       <div class="modal-overlay">
         <div class="modal-content">
           <div class="modal-header">
-            <h3>Select Product Image</h3>
+            <h3>Select Product Images</h3>
+            <p class="modal-subtitle">Select up to ${maxFiles} more image${maxFiles > 1 ? 's' : ''}</p>
             <button class="modal-close-button" id="close-modal">×</button>
           </div>
           <div class="modal-body">
@@ -795,7 +861,7 @@ export class CreateProduct {
           </div>
           <div class="modal-footer">
             <button class="cancel-button" id="modal-cancel">Cancel</button>
-            <button class="create-button" id="modal-select" disabled>Select File</button>
+            <button class="create-button" id="modal-select" disabled>Select Images</button>
           </div>
         </div>
       </div>
@@ -813,7 +879,8 @@ export class CreateProduct {
     const searchInput = modal.querySelector('#modal-search');
     const overlay = modal.querySelector('.modal-overlay');
     
-    let selectedFileUrl = null;
+    let selectedFiles = [];
+    const maxFiles = 5 - this.selectedImageUrls.length;
 
     // Close modal handlers
     const closeModal = () => {
@@ -832,11 +899,13 @@ export class CreateProduct {
 
     // Select file handler
     selectButton.addEventListener('click', () => {
-      if (selectedFileUrl) {
-        const mainImageInput = this.element.querySelector('#main-image');
-        mainImageInput.value = selectedFileUrl;
+      if (selectedFiles.length > 0) {
+        // Dispatch custom event with selected files
+        window.dispatchEvent(new CustomEvent('files-selected', {
+          detail: { files: selectedFiles }
+        }));
         closeModal();
-        toast.success('Image selected successfully!');
+        toast.success(`${selectedFiles.length} image${selectedFiles.length > 1 ? 's' : ''} selected successfully!`);
       }
     });
 
@@ -849,15 +918,30 @@ export class CreateProduct {
     modal.addEventListener('click', (e) => {
       const fileItem = e.target.closest('.modal-file-item');
       if (fileItem) {
-        // Remove previous selection
-        modal.querySelectorAll('.modal-file-item').forEach(item => {
-          item.classList.remove('selected');
-        });
+        const fileData = {
+          id: fileItem.dataset.fileId,
+          filename: fileItem.dataset.filename,
+          downloadURL: fileItem.dataset.fileUrl
+        };
         
-        // Add selection to clicked item
-        fileItem.classList.add('selected');
-        selectedFileUrl = fileItem.dataset.fileUrl;
-        selectButton.disabled = false;
+        if (fileItem.classList.contains('selected')) {
+          // Remove from selection
+          fileItem.classList.remove('selected');
+          selectedFiles = selectedFiles.filter(f => f.id !== fileData.id);
+        } else {
+          // Add to selection if under limit
+          if (selectedFiles.length < maxFiles) {
+            fileItem.classList.add('selected');
+            selectedFiles.push(fileData);
+          } else {
+            toast.warning(`You can only select ${maxFiles} more image${maxFiles > 1 ? 's' : ''}.`);
+          }
+        }
+        
+        selectButton.disabled = selectedFiles.length === 0;
+        selectButton.textContent = selectedFiles.length > 0 ? 
+          `Select ${selectedFiles.length} Image${selectedFiles.length > 1 ? 's' : ''}` : 
+          'Select Images';
       }
     });
   }
@@ -895,7 +979,7 @@ export class CreateProduct {
       }
 
       const filesHTML = imageFiles.map(file => `
-        <div class="modal-file-item" data-file-url="${file.downloadURL}" data-filename="${file.filename}">
+        <div class="modal-file-item" data-file-url="${file.downloadURL}" data-filename="${file.filename}" data-file-id="${file.id}">
           <div class="modal-file-thumbnail">
             <img src="${file.downloadURL}" alt="${file.filename}" loading="lazy" />
           </div>

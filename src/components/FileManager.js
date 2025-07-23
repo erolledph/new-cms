@@ -1184,13 +1184,13 @@ export class FileManager {
         </div>
         <div class="file-item-actions">
           <button class="file-action-button copy-url-button" data-file-id="${file.id}" title="Copy URL">
-            📋
+            <i class="fas fa-copy"></i>
           </button>
           <button class="file-action-button select-file-button" data-file-id="${file.id}" title="Select File">
-            ✅
+            <i class="fas fa-check"></i>
           </button>
           <button class="file-action-button delete-file-button" data-file-id="${file.id}" title="Delete">
-            🗑️
+            <i class="fas fa-trash-alt"></i>
           </button>
         </div>
       </div>

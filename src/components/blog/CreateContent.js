@@ -139,8 +139,16 @@ export class CreateContent {
                     placeholder="https://example.com/image.jpg"
                   >
                   <button type="button" class="file-select-button" id="select-image-button">
-                    SELECT from Files
+                    <i class="fas fa-image"></i>
+                    Select from Files
                   </button>
+                </div>
+              </div>
+              
+              <div class="selected-image-preview" id="selected-image-preview" style="display: none;">
+                <h4>Selected Image</h4>
+                <div class="blog-image-preview" id="blog-image-preview">
+                  <!-- Selected image will be displayed here -->
                 </div>
               </div>
               
@@ -292,6 +300,11 @@ export class CreateContent {
 
     slugInput.addEventListener('blur', () => {
       this.validateSlug();
+    });
+
+    // Listen for file selection events
+    window.addEventListener('file-selected', (e) => {
+      this.handleFileSelected(e.detail);
     });
   }
 
@@ -697,6 +710,46 @@ export class CreateContent {
     toast.error(message);
   }
 
+  handleFileSelected(fileData) {
+    const featuredImageInput = this.element.querySelector('#featured-image');
+    featuredImageInput.value = fileData.downloadURL;
+    this.displaySelectedImage(fileData.downloadURL);
+    toast.success('Image selected successfully!');
+  }
+
+  displaySelectedImage(imageUrl) {
+    const previewSection = this.element.querySelector('#selected-image-preview');
+    const previewContainer = this.element.querySelector('#blog-image-preview');
+    
+    if (imageUrl) {
+      previewContainer.innerHTML = `
+        <div class="blog-selected-image-item">
+          <img src="${imageUrl}" alt="Selected featured image" />
+          <button type="button" class="remove-image-button" id="remove-blog-image">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      `;
+      
+      previewSection.style.display = 'block';
+      
+      // Add event listener for remove button
+      const removeButton = previewContainer.querySelector('#remove-blog-image');
+      removeButton.addEventListener('click', () => {
+        this.removeSelectedImage();
+      });
+    } else {
+      previewSection.style.display = 'none';
+      previewContainer.innerHTML = '';
+    }
+  }
+
+  removeSelectedImage() {
+    const featuredImageInput = this.element.querySelector('#featured-image');
+    featuredImageInput.value = '';
+    this.displaySelectedImage('');
+    toast.info('Image removed successfully!');
+  }
   openFileSelectionModal() {
     // Create modal overlay
     const modal = document.createElement('div');
@@ -756,10 +809,11 @@ export class CreateContent {
     // Select file handler
     selectButton.addEventListener('click', () => {
       if (selectedFileUrl) {
-        const featuredImageInput = this.element.querySelector('#featured-image');
-        featuredImageInput.value = selectedFileUrl;
+        // Dispatch custom event with selected file
+        window.dispatchEvent(new CustomEvent('file-selected', {
+          detail: { downloadURL: selectedFileUrl }
+        }));
         closeModal();
-        toast.success('Image selected successfully!');
       }
     });
 

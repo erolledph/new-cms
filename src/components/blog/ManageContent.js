@@ -367,18 +367,15 @@ export class ManageContent {
         <div class="table-cell actions-cell">
           <div class="post-actions">
             <button class="post-action-button edit-button" data-post-id="${post.id}" title="Edit">
-              EDIT
+              <i class="fas fa-edit"></i>
             </button>
             <button class="post-action-button ${post.status === 'published' ? 'draft-button' : 'publish-button'}" 
                     data-post-id="${post.id}" 
                     title="${post.status === 'published' ? 'Move to Draft' : 'Publish'}">
-              ${post.status === 'published' ? 'DRAFT' : 'PUBLISH'}
-            </button>
-            <button class="post-action-button duplicate-button" data-post-id="${post.id}" title="Duplicate">
-              COPY
+              <i class="fas fa-${post.status === 'published' ? 'file-alt' : 'globe'}"></i>
             </button>
             <button class="post-action-button delete-button" data-post-id="${post.id}" title="Delete">
-              DELETE
+              <i class="fas fa-trash-alt"></i>
             </button>
           </div>
         </div>
@@ -391,7 +388,6 @@ export class ManageContent {
     const postCheckboxes = this.element.querySelectorAll('.post-checkbox[data-post-id]');
     const editButtons = this.element.querySelectorAll('.edit-button');
     const publishDraftButtons = this.element.querySelectorAll('.publish-button, .draft-button');
-    const duplicateButtons = this.element.querySelectorAll('.duplicate-button');
     const deleteButtons = this.element.querySelectorAll('.delete-button');
 
     // Select all functionality
@@ -421,13 +417,6 @@ export class ManageContent {
       button.addEventListener('click', (e) => {
         const postId = e.target.dataset.postId;
         this.handleTogglePostStatus(postId);
-      });
-    });
-
-    duplicateButtons.forEach(button => {
-      button.addEventListener('click', (e) => {
-        const postId = e.target.dataset.postId;
-        this.handleDuplicatePost(postId);
       });
     });
 
@@ -513,12 +502,6 @@ export class ManageContent {
     window.dispatchEvent(new CustomEvent('navigate-to-section', { 
       detail: { section: `edit-content-${this.blogSiteId}-${postId}` } 
     }));
-  }
-
-  handleDuplicatePost(postId) {
-    // For now, show a placeholder message
-    // In a full implementation, this would create a copy of the post
-    alert(`Duplicate functionality for post ${postId} will be implemented in a future update!`);
   }
 
   async handleBulkAction(action) {

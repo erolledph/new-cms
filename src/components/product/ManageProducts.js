@@ -413,18 +413,15 @@ export class ManageProducts {
         <div class="table-cell actions-cell">
           <div class="product-actions">
             <button class="product-action-button edit-button" data-product-id="${product.id}" title="Edit">
-              EDIT
+              <i class="fas fa-edit"></i>
             </button>
             <button class="product-action-button ${product.status === 'published' ? 'draft-button' : 'publish-button'}" 
                     data-product-id="${product.id}" 
                     title="${product.status === 'published' ? 'Move to Draft' : 'Publish'}">
-              ${product.status === 'published' ? 'DRAFT' : 'PUBLISH'}
-            </button>
-            <button class="product-action-button duplicate-button" data-product-id="${product.id}" title="Duplicate">
-              COPY
+              <i class="fas fa-${product.status === 'published' ? 'file-alt' : 'globe'}"></i>
             </button>
             <button class="product-action-button delete-button" data-product-id="${product.id}" title="Delete">
-              DELETE
+              <i class="fas fa-trash-alt"></i>
             </button>
           </div>
         </div>
@@ -437,7 +434,6 @@ export class ManageProducts {
     const productCheckboxes = this.element.querySelectorAll('.product-checkbox[data-product-id]');
     const editButtons = this.element.querySelectorAll('.edit-button');
     const publishDraftButtons = this.element.querySelectorAll('.publish-button, .draft-button');
-    const duplicateButtons = this.element.querySelectorAll('.duplicate-button');
     const deleteButtons = this.element.querySelectorAll('.delete-button');
 
     // Select all functionality
@@ -467,13 +463,6 @@ export class ManageProducts {
       button.addEventListener('click', (e) => {
         const productId = e.target.dataset.productId;
         this.handleToggleProductStatus(productId);
-      });
-    });
-
-    duplicateButtons.forEach(button => {
-      button.addEventListener('click', (e) => {
-        const productId = e.target.dataset.productId;
-        this.handleDuplicateProduct(productId);
       });
     });
 
@@ -558,12 +547,6 @@ export class ManageProducts {
     window.dispatchEvent(new CustomEvent('navigate-to-section', { 
       detail: { section: `edit-product-${this.productSiteId}-${productId}` } 
     }));
-  }
-
-  handleDuplicateProduct(productId) {
-    // For now, show a placeholder message
-    // In a full implementation, this would create a copy of the product
-    alert(`Duplicate functionality for product ${productId} will be implemented in a future update!`);
   }
 
   async handleBulkAction(action) {
