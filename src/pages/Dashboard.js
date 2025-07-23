@@ -33,23 +33,20 @@ export class DashboardPage {
     this.element = document.createElement('div');
     this.element.className = 'dashboard-container';
     this.element.innerHTML = `
-      <div class="dashboard-header">
-        <div class="header-left">
-          <h1>Firebase CMS</h1>
-          <button class="hamburger-menu" id="hamburger-menu">
-            <i class="fas fa-bars"></i>
-          </button>
-        </div>
-        <div class="header-right">
-          <span class="user-email">${this.currentUser?.email || 'User'}</span>
-          <button id="logout-button" class="logout-button">Logout</button>
-        </div>
-      </div>
-      
       <div class="dashboard-body">
+        <button class="hamburger-menu" id="hamburger-menu" aria-expanded="false" aria-controls="sidebar" aria-label="Toggle navigation menu">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+        
         <nav class="sidebar" id="sidebar">
           <div class="sidebar-overlay" id="sidebar-overlay"></div>
           <div class="sidebar-content">
+            <div class="sidebar-header">
+              <h1 class="cms-title">Firebase CMS</h1>
+            </div>
+            
             <div class="nav-item" data-section="overview">
               <i class="nav-icon fas fa-tachometer-alt"></i>
               <span class="nav-text">Overview</span>
@@ -103,6 +100,13 @@ export class DashboardPage {
             <div class="nav-item" data-section="settings">
               <i class="nav-icon fas fa-cog"></i>
               <span class="nav-text">Settings</span>
+            </div>
+            
+            <div class="sidebar-footer">
+              <button id="logout-button" class="logout-button">
+                <i class="nav-icon fas fa-sign-out-alt"></i>
+                <span class="nav-text">Logout</span>
+              </button>
             </div>
           </div>
         </nav>
@@ -403,12 +407,22 @@ export class DashboardPage {
 
   toggleSidebar() {
     const sidebar = this.element.querySelector('#sidebar');
-    sidebar.classList.toggle('sidebar-open');
+    const hamburgerMenu = this.element.querySelector('#hamburger-menu');
+    const isOpen = sidebar.classList.toggle('sidebar-open');
+    
+    // Update ARIA attributes for accessibility
+    hamburgerMenu.setAttribute('aria-expanded', isOpen.toString());
+    hamburgerMenu.classList.toggle('active', isOpen);
   }
 
   closeSidebar() {
     const sidebar = this.element.querySelector('#sidebar');
+    const hamburgerMenu = this.element.querySelector('#hamburger-menu');
     sidebar.classList.remove('sidebar-open');
+    
+    // Update ARIA attributes for accessibility
+    hamburgerMenu.setAttribute('aria-expanded', 'false');
+    hamburgerMenu.classList.remove('active');
   }
 
   toggleSection(header) {

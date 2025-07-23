@@ -773,7 +773,6 @@ export class EditProduct {
         filesCollectionRef, 
         where('type', '>=', 'image/'),
         where('type', '<', 'image/\uf8ff'),
-        orderBy('type'),
         orderBy('uploadedAt', 'desc')
       );
       const filesSnapshot = await getDocs(filesQuery);
