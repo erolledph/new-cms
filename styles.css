@@ -215,7 +215,7 @@ body {
   position: fixed;
   top: var(--space-4);
   left: var(--space-4);
-  z-index: 1001;
+  z-index: 1000;
   background: white;
   border: 1px solid var(--neutral-200);
   border-radius: var(--radius-md);
@@ -254,7 +254,7 @@ body {
   background: white;
   border-right: 1px solid #e5e7eb;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 1000;
+  z-index: 999;
   overflow: hidden;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   display: flex;
@@ -263,6 +263,7 @@ body {
 
 .sidebar-overlay {
   display: none;
+  z-index: 998;
 }
 
 .sidebar-content {
@@ -1354,7 +1355,7 @@ body {
   position: fixed;
   top: var(--space-4);
   right: var(--space-4);
-  z-index: 10000;
+  z-index: 10003;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
@@ -1471,7 +1472,7 @@ body {
     transform: translateX(-100%);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: fixed;
-    z-index: 1000;
+    z-index: 999;
   }
 
   .sidebar.sidebar-open {
@@ -1488,7 +1489,7 @@ body {
     height: 100%;
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(4px);
-    z-index: 999;
+    z-index: 998;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1819,11 +1820,13 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 10000;
+  z-index: 10001;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--space-4);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
 }
 
 .modal-overlay {
@@ -1832,8 +1835,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  background: transparent;
 }
 
 .modal-content {
@@ -1846,6 +1848,7 @@ body {
   max-height: 80vh;
   display: flex;
   flex-direction: column;
+  z-index: 10002;
 }
 
 .modal-header {
@@ -1948,6 +1951,30 @@ body {
   display: flex;
   gap: var(--space-4);
   justify-content: flex-end;
+}
+
+/* Global File Modal Specific Styles */
+#global-file-modal .modal-subtitle {
+  font-size: 14px;
+  color: var(--neutral-600);
+  margin: 0;
+}
+
+#global-file-modal .modal-file-item {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#global-file-modal .modal-file-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+#global-file-modal .modal-file-item.selected {
+  border-color: var(--primary-500);
+  background: var(--primary-50);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
 }
 
 /* Documentation */

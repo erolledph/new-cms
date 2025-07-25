@@ -2,15 +2,6 @@
 const { getFirestore, handleCORS, successResponse, errorResponse, validateParams, getParamsFromEvent } = require('./firebase-admin');
 
 exports.handler = async (event, context) => {
-  // Add detailed logging to diagnose parameter issues
-  console.log('=== PRODUCTS FUNCTION DEBUG START ===');
-  console.log('Full event object received by products function:', JSON.stringify(event, null, 2));
-  console.log('Query string parameters received by products function:', event.queryStringParameters);
-  console.log('Event path:', event.path);
-  console.log('Event headers:', JSON.stringify(event.headers, null, 2));
-  console.log('Event httpMethod:', event.httpMethod);
-  console.log('=== PRODUCTS FUNCTION DEBUG END ===');
-
   try {
     // Handle CORS preflight requests
     const corsResponse = handleCORS(event);
@@ -25,15 +16,10 @@ exports.handler = async (event, context) => {
     const params = getParamsFromEvent(event, ['uid', 'siteId']);
     const { uid, siteId } = params;
     
-    // Log parameters for debugging
-    console.log('Products API - Extracted parameters:', params);
-    console.log('Products API - Path:', event.path);
-    
     // Validate required parameters
     try {
       validateParams({ uid, siteId }, ['uid', 'siteId']);
     } catch (error) {
-      console.error('Products API - Parameter validation failed:', error.message);
       return errorResponse(400, error.message);
     }
 

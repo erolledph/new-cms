@@ -9,10 +9,10 @@ import { ManageContent } from '../components/blog/ManageContent.js';
 import { FileManager } from '../components/FileManager.js';
 import { CreateProductSite } from '../components/product/CreateProductSite.js';
 import { ManageProductSites } from '../components/product/ManageProductSites.js';
-import { CreateProduct } from '../components/product/CreateProduct.js';
+import CreateProduct from '../components/product/CreateProduct.js';
 import { ManageProducts } from '../components/product/ManageProducts.js';
-import { EditContent } from '../components/blog/EditContent.js';
-import { EditProduct } from '../components/product/EditProduct.js';
+import EditContent from '../components/blog/EditContent.js';
+import EditProduct from '../components/product/EditProduct.js';
 import { Settings } from '../components/Settings.js';
 import { Analytics } from '../components/Analytics.js';
 import { Documentation } from '../components/Documentation.js';
@@ -25,6 +25,7 @@ export class DashboardPage {
     this.currentUser = null;
     this.userData = null;
     this.isLoading = true;
+    this.fileSelectionModal = null;
   }
 
   render() {
@@ -123,10 +124,36 @@ export class DashboardPage {
         <main class="main-content" id="main-content">
           <!-- Dynamic content will be loaded here -->
         </main>
+        
+        <!-- Global File Selection Modal -->
+        <div class="file-selection-modal" id="global-file-modal" style="display: none;">
+          <div class="modal-overlay">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h3 id="modal-title">Select Files</h3>
+                <p class="modal-subtitle" id="modal-subtitle"></p>
+                <button class="modal-close-button" id="close-global-modal">×</button>
+              </div>
+              <div class="modal-body">
+                <div class="modal-search">
+                  <input type="text" id="global-modal-search" placeholder="Search files..." class="search-input">
+                </div>
+                <div class="modal-files-grid" id="global-modal-files-grid">
+                  <div class="loading-message">Loading files...</div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button class="cancel-button" id="global-modal-cancel">Cancel</button>
+                <button class="create-button" id="global-modal-select" disabled>Select Files</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     `;
 
     this.attachEventListeners();
+    this.initializeGlobalFileModal();
     this.loadUserData(); // Load user data from Firestore
     this.loadSection('overview'); // Load overview by default
     return this.element;
@@ -179,13 +206,32 @@ export class DashboardPage {
     const blogContent = this.element.querySelector('#blog-content');
     if (!blogContent) return;
 
-    // Remove existing dynamic blog sites
+    // Get existing blog site elements
     const existingBlogSites = blogContent.querySelectorAll('[data-blog-site-id]');
-    existingBlogSites.forEach(item => item.remove());
+    const existingSiteIds = Array.from(existingBlogSites).map(item => item.dataset.blogSiteId);
+    const currentSiteIds = this.userData?.blogSites?.map(site => site.id) || [];
+    
+    // Remove sites that no longer exist
+    existingBlogSites.forEach(item => {
+      if (!currentSiteIds.includes(item.dataset.blogSiteId)) {
+        item.remove();
+      }
+    });
 
-    // Add current blog sites
+    // Add or update current blog sites
     if (this.userData && this.userData.blogSites) {
       this.userData.blogSites.forEach(blogSite => {
+        // Skip if site already exists and hasn't changed
+        const existingSite = blogContent.querySelector(`[data-blog-site-id="${blogSite.id}"]`);
+        if (existingSite) {
+          // Update site name if changed
+          const nameElement = existingSite.querySelector('.nav-expandable-text');
+          if (nameElement && nameElement.textContent !== blogSite.name) {
+            nameElement.textContent = blogSite.name;
+          }
+          return;
+        }
+        
         // Create expandable blog site section
         const blogSiteExpandable = document.createElement('div');
         blogSiteExpandable.className = 'nav-expandable';
@@ -249,13 +295,32 @@ export class DashboardPage {
     const productsContent = this.element.querySelector('#products-content');
     if (!productsContent) return;
 
-    // Remove existing dynamic product sites
+    // Get existing product site elements
     const existingProductSites = productsContent.querySelectorAll('[data-product-site-id]');
-    existingProductSites.forEach(item => item.remove());
+    const existingSiteIds = Array.from(existingProductSites).map(item => item.dataset.productSiteId);
+    const currentSiteIds = this.userData?.productSites?.map(site => site.id) || [];
+    
+    // Remove sites that no longer exist
+    existingProductSites.forEach(item => {
+      if (!currentSiteIds.includes(item.dataset.productSiteId)) {
+        item.remove();
+      }
+    });
 
-    // Add current product sites
+    // Add or update current product sites
     if (this.userData && this.userData.productSites) {
       this.userData.productSites.forEach(productSite => {
+        // Skip if site already exists and hasn't changed
+        const existingSite = productsContent.querySelector(`[data-product-site-id="${productSite.id}"]`);
+        if (existingSite) {
+          // Update site name if changed
+          const nameElement = existingSite.querySelector('.nav-expandable-text');
+          if (nameElement && nameElement.textContent !== productSite.name) {
+            nameElement.textContent = productSite.name;
+          }
+          return;
+        }
+        
         // Create expandable product site section
         const productSiteExpandable = document.createElement('div');
         productSiteExpandable.className = 'nav-expandable';
@@ -313,6 +378,212 @@ export class DashboardPage {
     
     // Re-attach expandable toggle listeners after updating sidebar
     this.attachExpandableToggleListeners();
+  }
+
+  initializeGlobalFileModal() {
+    this.fileSelectionModal = this.element.querySelector('#global-file-modal');
+    const closeButton = this.fileSelectionModal.querySelector('#close-global-modal');
+    const cancelButton = this.fileSelectionModal.querySelector('#global-modal-cancel');
+    const overlay = this.fileSelectionModal.querySelector('.modal-overlay');
+    
+    // Close modal handlers
+    const closeModal = () => {
+      this.fileSelectionModal.style.display = 'none';
+      document.body.style.overflow = '';
+    };
+
+    closeButton.addEventListener('click', closeModal);
+    cancelButton.addEventListener('click', closeModal);
+    
+    // Close on overlay click
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        closeModal();
+      }
+    });
+
+    // Listen for global file selection requests
+    window.addEventListener('open-file-modal', (e) => {
+      this.openGlobalFileModal(e.detail);
+    });
+  }
+
+  async openGlobalFileModal(options = {}) {
+    const {
+      title = 'Select Files',
+      subtitle = '',
+      maxFiles = 1,
+      fileType = 'image',
+      onSelect = null
+    } = options;
+
+    const modal = this.fileSelectionModal;
+    const titleElement = modal.querySelector('#modal-title');
+    const subtitleElement = modal.querySelector('#modal-subtitle');
+    const filesGrid = modal.querySelector('#global-modal-files-grid');
+    const selectButton = modal.querySelector('#global-modal-select');
+    const searchInput = modal.querySelector('#global-modal-search');
+    
+    // Set modal content
+    titleElement.textContent = title;
+    subtitleElement.textContent = subtitle;
+    selectButton.textContent = maxFiles === 1 ? 'Select File' : 'Select Files';
+    selectButton.disabled = true;
+    
+    // Show modal
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    // Load files
+    await this.loadGlobalModalFiles(fileType, maxFiles, onSelect);
+  }
+
+  async loadGlobalModalFiles(fileType, maxFiles, onSelect) {
+    const filesGrid = this.fileSelectionModal.querySelector('#global-modal-files-grid');
+    const selectButton = this.fileSelectionModal.querySelector('#global-modal-select');
+    const searchInput = this.fileSelectionModal.querySelector('#global-modal-search');
+    
+    let selectedFiles = [];
+    
+    try {
+      // Import Firebase modules
+      const { collection, getDocs, query, orderBy, where } = await import('firebase/firestore');
+      const { db } = await import('../firebase.js');
+      
+      // Load files based on type
+      const filesCollectionRef = collection(db, 'users', this.currentUser.uid, 'files');
+      let filesQuery;
+      
+      if (fileType === 'image') {
+        filesQuery = query(
+          filesCollectionRef, 
+          where('type', '>=', 'image/'),
+          where('type', '<', 'image/\uf8ff'),
+          orderBy('uploadedAt', 'desc')
+        );
+      } else {
+        filesQuery = query(filesCollectionRef, orderBy('uploadedAt', 'desc'));
+      }
+      
+      const filesSnapshot = await getDocs(filesQuery);
+      const files = filesSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      if (files.length === 0) {
+        filesGrid.innerHTML = `
+          <div class="empty-modal-state">
+            <p>No ${fileType} files found. Upload some files first!</p>
+          </div>
+        `;
+        return;
+      }
+
+      const filesHTML = files.map(file => `
+        <div class="modal-file-item" data-file-url="${file.downloadURL}" data-filename="${file.filename}" data-file-id="${file.id}">
+          <div class="modal-file-thumbnail">
+            ${file.type && file.type.startsWith('image/') ? 
+              `<img src="${file.downloadURL}" alt="${file.filename}" loading="lazy" />` :
+              `<div class="document-icon">${this.getDocumentIcon(file.type)}</div>`
+            }
+          </div>
+          <div class="modal-file-info">
+            <div class="modal-file-name">${file.filename}</div>
+            <div class="modal-file-details">
+              ${file.dimensions ? `${file.dimensions.width} × ${file.dimensions.height}` : ''}
+              ${file.dimensions ? ' • ' : ''}${this.formatFileSize(file.size || 0)}
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      filesGrid.innerHTML = filesHTML;
+      
+      // Attach file selection handlers
+      filesGrid.addEventListener('click', (e) => {
+        const fileItem = e.target.closest('.modal-file-item');
+        if (fileItem) {
+          const fileData = {
+            id: fileItem.dataset.fileId,
+            filename: fileItem.dataset.filename,
+            downloadURL: fileItem.dataset.fileUrl
+          };
+          
+          if (fileItem.classList.contains('selected')) {
+            // Remove from selection
+            fileItem.classList.remove('selected');
+            selectedFiles = selectedFiles.filter(f => f.id !== fileData.id);
+          } else {
+            // Add to selection if under limit
+            if (selectedFiles.length < maxFiles) {
+              fileItem.classList.add('selected');
+              selectedFiles.push(fileData);
+            } else {
+              toast.warning(`You can only select ${maxFiles} file${maxFiles > 1 ? 's' : ''}.`);
+            }
+          }
+          
+          selectButton.disabled = selectedFiles.length === 0;
+          selectButton.textContent = selectedFiles.length > 0 ? 
+            `Select ${selectedFiles.length} File${selectedFiles.length > 1 ? 's' : ''}` : 
+            (maxFiles === 1 ? 'Select File' : 'Select Files');
+        }
+      });
+      
+      // Search functionality
+      searchInput.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        const fileItems = filesGrid.querySelectorAll('.modal-file-item');
+        
+        fileItems.forEach(item => {
+          const filename = item.dataset.filename.toLowerCase();
+          const shouldShow = !term || filename.includes(term);
+          item.style.display = shouldShow ? 'block' : 'none';
+        });
+      });
+      
+      // Select button handler
+      selectButton.onclick = () => {
+        if (selectedFiles.length > 0 && onSelect) {
+          onSelect(selectedFiles);
+          this.fileSelectionModal.style.display = 'none';
+          document.body.style.overflow = '';
+        }
+      };
+      
+    } catch (error) {
+      console.error('Error loading files for modal:', error);
+      filesGrid.innerHTML = `
+        <div class="error-modal-state">
+          <p style="color: #dc3545;">Error loading files. Please try again.</p>
+        </div>
+      `;
+    }
+  }
+
+  getDocumentIcon(mimeType) {
+    switch (mimeType) {
+      case 'application/pdf':
+        return 'PDF';
+      case 'application/msword':
+      case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+        return 'DOC';
+      case 'text/plain':
+        return 'TXT';
+      default:
+        return 'FILE';
+    }
+  }
+
+  formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 
   formatDate(timestamp) {
@@ -416,17 +687,23 @@ export class DashboardPage {
     const expandableHeaders = this.element.querySelectorAll('.nav-expandable-header');
     expandableHeaders.forEach(header => {
       // Remove existing listeners to prevent duplicates
-      header.removeEventListener('click', this.handleExpandableToggle);
+      const existingHandler = header._expandableHandler;
+      if (existingHandler) {
+        header.removeEventListener('click', existingHandler);
+      }
       
-      // Add new listener
-      header.addEventListener('click', (e) => {
+      // Create and store new listener
+      const newHandler = (e) => {
         e.stopPropagation();
         // Only toggle on desktop, mobile shows all sections expanded
         if (window.innerWidth > 768) {
           const expandable = header.closest('.nav-expandable');
           this.toggleExpandable(expandable);
         }
-      });
+      };
+      
+      header._expandableHandler = newHandler;
+      header.addEventListener('click', newHandler);
     });
   }
 

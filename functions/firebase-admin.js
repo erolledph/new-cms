@@ -92,73 +92,20 @@ function validateParams(params, required) {
 
 // Enhanced parameter extraction from event (query params or path)
 function getParamsFromEvent(event, expectedParams) {
-  console.log('=== PARAMETER EXTRACTION DEBUG ===');
-  console.log('Event path:', event.path);
-  console.log('Event queryStringParameters:', event.queryStringParameters);
-  console.log('Expected parameters:', expectedParams);
-  
   // First, try to get parameters from queryStringParameters
   const queryParams = event.queryStringParameters || {};
-  console.log('Query parameters found:', queryParams);
   
   // Check if we have all expected parameters from query string
   const hasAllQueryParams = expectedParams.every(param => queryParams[param]);
   
   if (hasAllQueryParams) {
-    console.log('Using parameters from queryStringParameters');
-    console.log('=== PARAMETER EXTRACTION END ===');
     return queryParams;
   }
   
-  // If query parameters are missing, parse from path
-  console.log('Query parameters incomplete, parsing from path...');
-  
-  const pathParams = {};
-  const path = event.path || '';
-  
-  // Remove leading slash and split by slash
-  const pathSegments = path.replace(/^\//, '').split('/');
-  console.log('Path segments:', pathSegments);
-  
-  // Determine API type and extract parameters accordingly
-  if (path.includes('/api/content.json')) {
-    // Format: /users/{uid}/blogs/{blogId}/api/content.json
-    if (pathSegments.length >= 6 && pathSegments[0] === 'users' && pathSegments[2] === 'blogs' && pathSegments[4] === 'api' && pathSegments[5] === 'content.json') {
-      pathParams.uid = pathSegments[1];
-      pathParams.blogId = pathSegments[3];
-      console.log('Extracted content API parameters from path:', pathParams);
-    }
-  } else if (path.includes('/api/content/') && path.endsWith('.json')) {
-    // Format: /users/{uid}/blogs/{blogId}/api/content/{slug}.json
-    if (pathSegments.length >= 7 && pathSegments[0] === 'users' && pathSegments[2] === 'blogs' && pathSegments[4] === 'api' && pathSegments[5] === 'content') {
-      pathParams.uid = pathSegments[1];
-      pathParams.blogId = pathSegments[3];
-      pathParams.slug = pathSegments[6].replace('.json', '');
-      console.log('Extracted content-slug API parameters from path:', pathParams);
-    }
-  } else if (path.includes('/api/products.json')) {
-    // Format: /users/{uid}/productSites/{siteId}/api/products.json
-    if (pathSegments.length >= 6 && pathSegments[0] === 'users' && pathSegments[2] === 'productSites' && pathSegments[4] === 'api' && pathSegments[5] === 'products.json') {
-      pathParams.uid = pathSegments[1];
-      pathParams.siteId = pathSegments[3];
-      console.log('Extracted products API parameters from path:', pathParams);
-    }
-  } else if (path.includes('/api/products/') && path.endsWith('.json')) {
-    // Format: /users/{uid}/productSites/{siteId}/api/products/{slug}.json
-    if (pathSegments.length >= 7 && pathSegments[0] === 'users' && pathSegments[2] === 'productSites' && pathSegments[4] === 'api' && pathSegments[5] === 'products') {
-      pathParams.uid = pathSegments[1];
-      pathParams.siteId = pathSegments[3];
-      pathParams.slug = pathSegments[6].replace('.json', '');
-      console.log('Extracted products-slug API parameters from path:', pathParams);
-    }
-  }
-  
-  // Merge query params with path params (path params take precedence)
-  const finalParams = { ...queryParams, ...pathParams };
-  console.log('Final extracted parameters:', finalParams);
-  console.log('=== PARAMETER EXTRACTION END ===');
-  
-  return finalParams;
+  // If query parameters are missing, return empty object
+  // Netlify redirects should handle parameter mapping
+  console.warn('Missing query parameters. Expected:', expectedParams, 'Received:', Object.keys(queryParams));
+  return queryParams;
 }
 module.exports = {
   initializeFirebaseAdmin,

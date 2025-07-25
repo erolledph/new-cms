@@ -18,13 +18,8 @@ exports.handler = async (event, context) => {
     try {
       requestBody = JSON.parse(event.body || '{}');
     } catch (error) {
-      console.error('Analytics API - JSON parse error:', error.message);
       return errorResponse(400, 'Invalid JSON in request body');
     }
-
-    // Log request for debugging
-    console.log('Analytics API - Request body:', requestBody);
-    console.log('Analytics API - Headers:', event.headers);
 
     // Extract and validate required parameters
     const { uid, siteId, type, contentId } = requestBody;
@@ -32,7 +27,6 @@ exports.handler = async (event, context) => {
     try {
       validateParams({ uid, siteId, type }, ['uid', 'siteId', 'type']);
     } catch (error) {
-      console.error('Analytics API - Parameter validation failed:', error.message);
       return errorResponse(400, error.message);
     }
 
