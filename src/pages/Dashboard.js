@@ -48,66 +48,72 @@ export class DashboardPage {
             </div>
             
             <div class="sidebar-nav">
-              <div class="nav-item" data-section="overview">
-                <i class="nav-icon fas fa-tachometer-alt"></i>
-                <span class="nav-text">Overview</span>
-              </div>
-              
-              <div class="nav-item" data-section="analytics">
-                <i class="nav-icon fas fa-chart-line"></i>
-                <span class="nav-text">Analytics</span>
-              </div>
-              
-              <div class="nav-section">
-                <div class="nav-item nav-section-header" data-section="products">
-                  <i class="nav-icon fas fa-shopping-cart"></i>
-                  <span class="nav-text">Products</span>
-                  <i class="nav-arrow fas fa-chevron-right"></i>
+              <div class="nav-group">
+                <div class="nav-group-title">Dashboard</div>
+                <div class="nav-item" data-section="overview">
+                  <i class="nav-icon fas fa-home"></i>
+                  <span class="nav-text">Overview</span>
                 </div>
-                <div class="nav-subsection" id="products-subsection">
-                  <div class="nav-subitem" data-section="create-product-site">
-                    <i class="nav-icon fas fa-plus"></i>
-                    <span class="nav-text">Create Product Site</span>
+                <div class="nav-item" data-section="analytics">
+                  <i class="nav-icon fas fa-chart-line"></i>
+                  <span class="nav-text">Analytics</span>
+                </div>
+              </div>
+              
+              <div class="nav-group">
+                <div class="nav-group-title">Content</div>
+                <div class="nav-expandable" id="blog-expandable">
+                  <div class="nav-expandable-header">
+                    <i class="nav-expandable-icon fas fa-blog"></i>
+                    <span class="nav-expandable-text">Blog Sites</span>
+                    <i class="nav-expandable-arrow fas fa-chevron-right"></i>
                   </div>
-                  <!-- Dynamic product sites will be added here -->
-                </div>
-              </div>
-              
-              <div class="nav-section">
-                <div class="nav-item nav-section-header" data-section="blog">
-                  <i class="nav-icon fas fa-blog"></i>
-                  <span class="nav-text">Blog</span>
-                  <i class="nav-arrow fas fa-chevron-right"></i>
-                </div>
-                <div class="nav-subsection" id="blog-subsection">
-                  <div class="nav-subitem" data-section="create-blog-site">
-                    <i class="nav-icon fas fa-plus"></i>
-                    <span class="nav-text">Create Blog Site</span>
+                  <div class="nav-expandable-content" id="blog-content">
+                    <div class="nav-subitem" data-section="create-blog-site">
+                      <i class="nav-subitem-icon fas fa-plus"></i>
+                      <span class="nav-text">Create Blog Site</span>
+                    </div>
+                    <!-- Dynamic blog sites will be added here -->
                   </div>
-                  <!-- Dynamic blog sites will be added here -->
+                </div>
+                
+                <div class="nav-expandable" id="products-expandable">
+                  <div class="nav-expandable-header">
+                    <i class="nav-expandable-icon fas fa-shopping-cart"></i>
+                    <span class="nav-expandable-text">Product Sites</span>
+                    <i class="nav-expandable-arrow fas fa-chevron-right"></i>
+                  </div>
+                  <div class="nav-expandable-content" id="products-content">
+                    <div class="nav-subitem" data-section="create-product-site">
+                      <i class="nav-subitem-icon fas fa-plus"></i>
+                      <span class="nav-text">Create Product Site</span>
+                    </div>
+                    <!-- Dynamic product sites will be added here -->
+                  </div>
                 </div>
               </div>
               
-              <div class="nav-item" data-section="file-manager">
-                <i class="nav-icon fas fa-folder"></i>
-                <span class="nav-text">File Manager</span>
-              </div>
-              
-              <div class="nav-item" data-section="documentation">
-                <i class="nav-icon fas fa-book"></i>
-                <span class="nav-text">Documentation</span>
-              </div>
-              
-              <div class="nav-item" data-section="settings">
-                <i class="nav-icon fas fa-cog"></i>
-                <span class="nav-text">Settings</span>
+              <div class="nav-group">
+                <div class="nav-group-title">Tools</div>
+                <div class="nav-item" data-section="file-manager">
+                  <i class="nav-icon fas fa-folder"></i>
+                  <span class="nav-text">File Manager</span>
+                </div>
+                <div class="nav-item" data-section="documentation">
+                  <i class="nav-icon fas fa-book"></i>
+                  <span class="nav-text">API Docs</span>
+                </div>
+                <div class="nav-item" data-section="settings">
+                  <i class="nav-icon fas fa-cog"></i>
+                  <span class="nav-text">Settings</span>
+                </div>
               </div>
             </div>
             
             <div class="sidebar-footer">
               <button id="logout-button" class="logout-button">
                 <i class="nav-icon fas fa-sign-out-alt"></i>
-                <span class="nav-text">Logout</span>
+                <span class="nav-text">Sign Out</span>
               </button>
             </div>
           </div>
@@ -170,56 +176,53 @@ export class DashboardPage {
   }
 
   updateBlogSitesInSidebar() {
-    const blogSubsection = this.element.querySelector('#blog-subsection');
-    if (!blogSubsection) return;
+    const blogContent = this.element.querySelector('#blog-content');
+    if (!blogContent) return;
 
-    // Remove existing dynamic blog sites (keep the "Create Blog Site" item)
-    const existingBlogSites = blogSubsection.querySelectorAll('[data-blog-site-id]');
+    // Remove existing dynamic blog sites
+    const existingBlogSites = blogContent.querySelectorAll('[data-blog-site-id]');
     existingBlogSites.forEach(item => item.remove());
 
     // Add current blog sites
     if (this.userData && this.userData.blogSites) {
       this.userData.blogSites.forEach(blogSite => {
-        // Create blog site section with nested items
-        const blogSiteSection = document.createElement('div');
-        blogSiteSection.className = 'nav-subsection-item';
-        blogSiteSection.dataset.blogSiteId = blogSite.id;
+        // Create expandable blog site section
+        const blogSiteExpandable = document.createElement('div');
+        blogSiteExpandable.className = 'nav-expandable';
+        blogSiteExpandable.dataset.blogSiteId = blogSite.id;
         
-        blogSiteSection.innerHTML = `
-          <div class="nav-subitem nav-section-header" data-section="manage-blog-site-${blogSite.id}">
-            <i class="nav-icon fas fa-globe"></i>
-            <span class="nav-text">${blogSite.name}</span>
-            <i class="nav-arrow fas fa-chevron-right"></i>
+        blogSiteExpandable.innerHTML = `
+          <div class="nav-expandable-header">
+            <i class="nav-expandable-icon fas fa-globe"></i>
+            <span class="nav-expandable-text">${blogSite.name}</span>
+            <i class="nav-expandable-arrow fas fa-chevron-right"></i>
           </div>
-          <div class="nav-sub-subsection">
-            <div class="nav-sub-subitem" data-section="create-content-${blogSite.id}">
-              <i class="nav-icon fas fa-plus"></i>
+          <div class="nav-expandable-content">
+            <div class="nav-subitem" data-section="create-content-${blogSite.id}">
+              <i class="nav-subitem-icon fas fa-plus"></i>
               <span class="nav-text">Create Content</span>
             </div>
-            <div class="nav-sub-subitem" data-section="manage-content-${blogSite.id}">
-              <i class="nav-icon fas fa-edit"></i>
+            <div class="nav-subitem" data-section="manage-content-${blogSite.id}">
+              <i class="nav-subitem-icon fas fa-edit"></i>
               <span class="nav-text">Manage Content</span>
             </div>
-            <div class="nav-sub-subitem" data-section="site-settings-blog-${blogSite.id}">
-              <i class="nav-icon fas fa-cog"></i>
+            <div class="nav-subitem" data-section="site-settings-blog-${blogSite.id}">
+              <i class="nav-subitem-icon fas fa-cog"></i>
               <span class="nav-text">Settings</span>
             </div>
           </div>
         `;
         
-        blogSubsection.appendChild(blogSiteSection);
+        blogContent.appendChild(blogSiteExpandable);
         
-        // Add event listeners for the blog site section
-        const sectionHeader = blogSiteSection.querySelector('.nav-section-header');
-        const subItems = blogSiteSection.querySelectorAll('.nav-sub-subitem');
+        // Add event listeners
+        const expandableHeader = blogSiteExpandable.querySelector('.nav-expandable-header');
+        const subItems = blogSiteExpandable.querySelectorAll('.nav-subitem');
         
-        // Toggle subsection
-        sectionHeader.addEventListener('click', (e) => {
+        // Toggle expandable
+        expandableHeader.addEventListener('click', (e) => {
           e.stopPropagation();
-          // Only handle the click if it's on the section header itself
-          if (e.target === sectionHeader || sectionHeader.contains(e.target)) {
-            this.toggleSubSection(sectionHeader);
-          }
+          this.toggleExpandable(blogSiteExpandable);
         });
         
         // Handle sub-item clicks
@@ -238,61 +241,58 @@ export class DashboardPage {
       });
     }
     
-    // Re-attach section toggle listeners after updating sidebar
-    this.attachSectionToggleListeners();
+    // Re-attach expandable toggle listeners after updating sidebar
+    this.attachExpandableToggleListeners();
   }
 
   updateProductSitesInSidebar() {
-    const productSubsection = this.element.querySelector('#products-subsection');
-    if (!productSubsection) return;
+    const productsContent = this.element.querySelector('#products-content');
+    if (!productsContent) return;
 
-    // Remove existing dynamic product sites (keep the "Create Product Site" item)
-    const existingProductSites = productSubsection.querySelectorAll('[data-product-site-id]');
+    // Remove existing dynamic product sites
+    const existingProductSites = productsContent.querySelectorAll('[data-product-site-id]');
     existingProductSites.forEach(item => item.remove());
 
     // Add current product sites
     if (this.userData && this.userData.productSites) {
       this.userData.productSites.forEach(productSite => {
-        // Create product site section with nested items
-        const productSiteSection = document.createElement('div');
-        productSiteSection.className = 'nav-subsection-item';
-        productSiteSection.dataset.productSiteId = productSite.id;
+        // Create expandable product site section
+        const productSiteExpandable = document.createElement('div');
+        productSiteExpandable.className = 'nav-expandable';
+        productSiteExpandable.dataset.productSiteId = productSite.id;
         
-        productSiteSection.innerHTML = `
-          <div class="nav-subitem nav-section-header" data-section="manage-product-site-${productSite.id}">
-            <i class="nav-icon fas fa-store"></i>
-            <span class="nav-text">${productSite.name}</span>
-            <i class="nav-arrow fas fa-chevron-right"></i>
+        productSiteExpandable.innerHTML = `
+          <div class="nav-expandable-header">
+            <i class="nav-expandable-icon fas fa-store"></i>
+            <span class="nav-expandable-text">${productSite.name}</span>
+            <i class="nav-expandable-arrow fas fa-chevron-right"></i>
           </div>
-          <div class="nav-sub-subsection">
-            <div class="nav-sub-subitem" data-section="create-product-${productSite.id}">
-              <i class="nav-icon fas fa-plus"></i>
+          <div class="nav-expandable-content">
+            <div class="nav-subitem" data-section="create-product-${productSite.id}">
+              <i class="nav-subitem-icon fas fa-plus"></i>
               <span class="nav-text">Create Product</span>
             </div>
-            <div class="nav-sub-subitem" data-section="manage-products-${productSite.id}">
-              <i class="nav-icon fas fa-boxes"></i>
+            <div class="nav-subitem" data-section="manage-products-${productSite.id}">
+              <i class="nav-subitem-icon fas fa-boxes"></i>
               <span class="nav-text">Manage Products</span>
             </div>
-            <div class="nav-sub-subitem" data-section="site-settings-product-${productSite.id}">
-              <i class="nav-icon fas fa-cog"></i>
+            <div class="nav-subitem" data-section="site-settings-product-${productSite.id}">
+              <i class="nav-subitem-icon fas fa-cog"></i>
               <span class="nav-text">Settings</span>
             </div>
           </div>
         `;
         
-        productSubsection.appendChild(productSiteSection);
+        productsContent.appendChild(productSiteExpandable);
         
-        // Add event listeners for the product site section
-        const sectionHeader = productSiteSection.querySelector('.nav-section-header');
-        const subItems = productSiteSection.querySelectorAll('.nav-sub-subitem');
+        // Add event listeners
+        const expandableHeader = productSiteExpandable.querySelector('.nav-expandable-header');
+        const subItems = productSiteExpandable.querySelectorAll('.nav-subitem');
         
-        // Toggle subsection
-        sectionHeader.addEventListener('click', (e) => {
+        // Toggle expandable
+        expandableHeader.addEventListener('click', (e) => {
           e.stopPropagation();
-          // Only handle the click if it's on the section header itself
-          if (e.target === sectionHeader || sectionHeader.contains(e.target)) {
-            this.toggleSubSection(sectionHeader);
-          }
+          this.toggleExpandable(productSiteExpandable);
         });
         
         // Handle sub-item clicks
@@ -311,8 +311,8 @@ export class DashboardPage {
       });
     }
     
-    // Re-attach section toggle listeners after updating sidebar
-    this.attachSectionToggleListeners();
+    // Re-attach expandable toggle listeners after updating sidebar
+    this.attachExpandableToggleListeners();
   }
 
   formatDate(timestamp) {
@@ -366,11 +366,11 @@ export class DashboardPage {
     });
 
     // Navigation items
-    const navItems = this.element.querySelectorAll('.nav-item, .nav-subitem, .nav-sub-subitem');
+    const navItems = this.element.querySelectorAll('.nav-item, .nav-subitem');
     navItems.forEach(item => {
       item.addEventListener('click', (e) => {
-        // Don't handle clicks on section headers that have arrows (they toggle sections)
-        if (e.currentTarget.classList.contains('nav-section-header') && e.currentTarget.querySelector('.nav-arrow')) {
+        // Don't handle clicks on expandable headers
+        if (e.currentTarget.classList.contains('nav-expandable-header')) {
           return;
         }
         
@@ -408,22 +408,23 @@ export class DashboardPage {
       this.loadUserData();
     });
 
-    // Collapsible sections - attach after DOM is ready
-    this.attachSectionToggleListeners();
+    // Expandable sections - attach after DOM is ready
+    this.attachExpandableToggleListeners();
   }
 
-  attachSectionToggleListeners() {
-    const sectionHeaders = this.element.querySelectorAll('.nav-section-header');
-    sectionHeaders.forEach(header => {
+  attachExpandableToggleListeners() {
+    const expandableHeaders = this.element.querySelectorAll('.nav-expandable-header');
+    expandableHeaders.forEach(header => {
       // Remove existing listeners to prevent duplicates
-      header.removeEventListener('click', this.handleSectionToggle);
+      header.removeEventListener('click', this.handleExpandableToggle);
       
       // Add new listener
       header.addEventListener('click', (e) => {
         e.stopPropagation();
         // Only toggle on desktop, mobile shows all sections expanded
         if (window.innerWidth > 768) {
-          this.toggleSection(header);
+          const expandable = header.closest('.nav-expandable');
+          this.toggleExpandable(expandable);
         }
       });
     });
@@ -489,71 +490,49 @@ export class DashboardPage {
       hamburgerIcon.className = 'hamburger-icon fas fa-bars';
       
       // Re-enable section toggling on desktop
-      this.attachSectionToggleListeners();
+      this.attachExpandableToggleListeners();
     } else {
-      // Mobile: Ensure all sections are expanded
-      const sections = this.element.querySelectorAll('.nav-section');
-      sections.forEach(section => {
-        section.classList.add('expanded');
-        const subsection = section.querySelector('.nav-subsection');
-        if (subsection) {
-          subsection.style.display = 'block';
-        }
+      // Mobile: Ensure all expandables are expanded
+      const expandables = this.element.querySelectorAll('.nav-expandable');
+      expandables.forEach(expandable => {
+        expandable.classList.add('expanded');
       });
     }
   }
 
-  toggleSection(header) {
-    const section = header.parentElement;
-    const subsection = section.querySelector('.nav-subsection');
-    const arrow = header.querySelector('.nav-arrow');
+  toggleExpandable(expandable) {
+    const content = expandable.querySelector('.nav-expandable-content');
+    const arrow = expandable.querySelector('.nav-expandable-arrow');
     
-    if (subsection) {
-      const isExpanded = section.classList.contains('expanded');
+    if (content) {
+      const isExpanded = expandable.classList.contains('expanded');
       
       if (isExpanded) {
-        section.classList.remove('expanded');
-        if (arrow) {
-          arrow.className = 'nav-arrow fas fa-chevron-right';
-        }
+        expandable.classList.remove('expanded');
       } else {
-        section.classList.add('expanded');
-        if (arrow) {
-          arrow.className = 'nav-arrow fas fa-chevron-down';
-        }
-      }
-    }
-  }
-
-  toggleSubSection(header) {
-    const section = header.parentElement;
-    const subsection = section.querySelector('.nav-sub-subsection');
-    const arrow = header.querySelector('.nav-arrow');
-    
-    if (subsection) {
-      const isExpanded = section.classList.contains('expanded');
-      
-      if (isExpanded) {
-        section.classList.remove('expanded');
-        if (arrow) {
-          arrow.className = 'nav-arrow fas fa-chevron-right';
-        }
-      } else {
-        section.classList.add('expanded');
-        if (arrow) {
-          arrow.className = 'nav-arrow fas fa-chevron-down';
-        }
+        expandable.classList.add('expanded');
       }
     }
   }
 
   setActiveNavItem(activeItem) {
     // Remove active class from all items
-    const allItems = this.element.querySelectorAll('.nav-item, .nav-subitem, .nav-sub-subitem');
+    const allItems = this.element.querySelectorAll('.nav-item, .nav-subitem, .nav-expandable-header');
     allItems.forEach(item => item.classList.remove('active'));
     
     // Add active class to clicked item
     activeItem.classList.add('active');
+    
+    // If it's a subitem, also mark its parent expandable header as active
+    if (activeItem.classList.contains('nav-subitem')) {
+      const parentExpandable = activeItem.closest('.nav-expandable');
+      if (parentExpandable) {
+        const parentHeader = parentExpandable.querySelector('.nav-expandable-header');
+        if (parentHeader) {
+          parentHeader.classList.add('active');
+        }
+      }
+    }
   }
 
   loadSection(sectionName) {
