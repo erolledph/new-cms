@@ -225,36 +225,23 @@ body {
   transition: all 0.2s ease;
   width: 40px;
   height: 40px;
-  flex-direction: column;
+  display: none;
   justify-content: center;
   align-items: center;
-  display: none;
 }
 
 .hamburger-menu:hover {
   background: var(--neutral-50);
 }
 
-.hamburger-line {
-  display: block;
-  width: 20px;
-  height: 3px;
-  background: var(--neutral-800);
-  margin: 3px 0;
-  transition: all 0.3s ease;
-  border-radius: 3px;
+.hamburger-icon {
+  font-size: 18px;
+  color: var(--neutral-800);
+  transition: all 0.2s ease;
 }
 
-.hamburger-menu.active .hamburger-line:nth-child(1) {
-  transform: rotate(-45deg) translate(-4px, 5px);
-}
-
-.hamburger-menu.active .hamburger-line:nth-child(2) {
-  opacity: 0;
-}
-
-.hamburger-menu.active .hamburger-line:nth-child(3) {
-  transform: rotate(45deg) translate(-4px, -5px);
+.hamburger-menu.active .hamburger-icon {
+  color: var(--primary-600);
 }
 
 /* Sidebar */
@@ -303,6 +290,22 @@ body {
   z-index: 10;
 }
 
+.sidebar-close-button {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--neutral-600);
+  cursor: pointer;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+}
+
+.sidebar-close-button:hover {
+  background: var(--neutral-100);
+  color: var(--neutral-800);
+}
 .cms-title {
   font-size: 20px;
   font-weight: 700;
@@ -444,8 +447,16 @@ body {
 .nav-sub-subsection {
   overflow: hidden;
   transition: max-height 0.3s ease;
+  max-height: 0;
 }
 
+.nav-section.expanded .nav-subsection {
+  max-height: 500px;
+}
+
+.nav-subsection-item.expanded .nav-sub-subsection {
+  max-height: 300px;
+}
 .nav-subsection {
   padding-left: var(--space-4);
 }
@@ -1350,6 +1361,9 @@ body {
     display: flex;
   }
 
+  .sidebar-close-button {
+    display: block;
+  }
   .sidebar {
     width: var(--sidebar-expanded-width);
     transform: translateX(-100%);
@@ -1410,6 +1424,20 @@ body {
     background: var(--neutral-400);
   }
 
+  /* Mobile navigation sections - always show expanded */
+  .nav-subsection,
+  .nav-sub-subsection {
+    max-height: none !important;
+    display: block !important;
+  }
+
+  .nav-section {
+    margin: var(--space-1) 0;
+  }
+
+  .nav-section-header .nav-arrow {
+    display: none;
+  }
   .content-section {
     padding: var(--space-4);
   }
@@ -1479,6 +1507,16 @@ body {
     align-items: flex-start;
   }
 }
+  .hamburger-menu {
+    top: var(--space-3);
+    left: var(--space-3);
+    width: 36px;
+    height: 36px;
+  }
+
+  .main-content {
+    padding-top: var(--space-12);
+  }
 
 /* Pricing Section */
 .pricing-section {
@@ -2458,6 +2496,24 @@ body {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   }
 }
+  .bulk-actions {
+    flex-direction: column;
+    gap: var(--space-3);
+    align-items: stretch;
+  }
+
+  .bulk-buttons {
+    justify-content: center;
+  }
+
+  .filter-controls {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .filter-select {
+    width: 100%;
+  }
 
 /* Focus States for Accessibility */
 .nav-item:focus,
