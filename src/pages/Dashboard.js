@@ -41,65 +41,66 @@ export class DashboardPage {
         </button>
         
         <nav class="sidebar" id="sidebar">
-          <div class="sidebar-overlay" id="sidebar-overlay"></div>
           <div class="sidebar-content">
             <div class="sidebar-header">
               <h1 class="cms-title">Firebase CMS</h1>
             </div>
             
-            <div class="nav-item" data-section="overview">
-              <i class="nav-icon fas fa-tachometer-alt"></i>
-              <span class="nav-text">Overview</span>
-            </div>
-            
-            <div class="nav-item" data-section="analytics">
-              <i class="nav-icon fas fa-chart-line"></i>
-              <span class="nav-text">Analytics</span>
-            </div>
-            
-            <div class="nav-section">
-              <div class="nav-item nav-section-header" data-section="products">
-                <i class="nav-icon fas fa-shopping-cart"></i>
-                <span class="nav-text">Products</span>
-                <i class="nav-arrow fas fa-chevron-right"></i>
+            <div class="sidebar-nav">
+              <div class="nav-item" data-section="overview">
+                <i class="nav-icon fas fa-tachometer-alt"></i>
+                <span class="nav-text">Overview</span>
               </div>
-              <div class="nav-subsection" id="products-subsection" style="display: block;">
-                <div class="nav-subitem" data-section="create-product-site">
-                  <i class="nav-icon fas fa-plus"></i>
-                  <span class="nav-text">Create Product Site</span>
+              
+              <div class="nav-item" data-section="analytics">
+                <i class="nav-icon fas fa-chart-line"></i>
+                <span class="nav-text">Analytics</span>
+              </div>
+              
+              <div class="nav-section">
+                <div class="nav-item nav-section-header" data-section="products">
+                  <i class="nav-icon fas fa-shopping-cart"></i>
+                  <span class="nav-text">Products</span>
+                  <i class="nav-arrow fas fa-chevron-right"></i>
                 </div>
-                <!-- Dynamic product sites will be added here -->
-              </div>
-            </div>
-            
-            <div class="nav-section">
-              <div class="nav-item nav-section-header" data-section="blog">
-                <i class="nav-icon fas fa-blog"></i>
-                <span class="nav-text">Blog</span>
-                <i class="nav-arrow fas fa-chevron-right"></i>
-              </div>
-              <div class="nav-subsection" id="blog-subsection" style="display: block;">
-                <div class="nav-subitem" data-section="create-blog-site">
-                  <i class="nav-icon fas fa-plus"></i>
-                  <span class="nav-text">Create Blog Site</span>
+                <div class="nav-subsection" id="products-subsection" style="display: none;">
+                  <div class="nav-subitem" data-section="create-product-site">
+                    <i class="nav-icon fas fa-plus"></i>
+                    <span class="nav-text">Create Product Site</span>
+                  </div>
+                  <!-- Dynamic product sites will be added here -->
                 </div>
-                <!-- Dynamic blog sites will be added here -->
               </div>
-            </div>
-            
-            <div class="nav-item" data-section="file-manager">
-              <i class="nav-icon fas fa-folder"></i>
-              <span class="nav-text">File Manager</span>
-            </div>
-            
-            <div class="nav-item" data-section="documentation">
-              <i class="nav-icon fas fa-book"></i>
-              <span class="nav-text">Documentation</span>
-            </div>
-            
-            <div class="nav-item" data-section="settings">
-              <i class="nav-icon fas fa-cog"></i>
-              <span class="nav-text">Settings</span>
+              
+              <div class="nav-section">
+                <div class="nav-item nav-section-header" data-section="blog">
+                  <i class="nav-icon fas fa-blog"></i>
+                  <span class="nav-text">Blog</span>
+                  <i class="nav-arrow fas fa-chevron-right"></i>
+                </div>
+                <div class="nav-subsection" id="blog-subsection" style="display: none;">
+                  <div class="nav-subitem" data-section="create-blog-site">
+                    <i class="nav-icon fas fa-plus"></i>
+                    <span class="nav-text">Create Blog Site</span>
+                  </div>
+                  <!-- Dynamic blog sites will be added here -->
+                </div>
+              </div>
+              
+              <div class="nav-item" data-section="file-manager">
+                <i class="nav-icon fas fa-folder"></i>
+                <span class="nav-text">File Manager</span>
+              </div>
+              
+              <div class="nav-item" data-section="documentation">
+                <i class="nav-icon fas fa-book"></i>
+                <span class="nav-text">Documentation</span>
+              </div>
+              
+              <div class="nav-item" data-section="settings">
+                <i class="nav-icon fas fa-cog"></i>
+                <span class="nav-text">Settings</span>
+              </div>
             </div>
             
             <div class="sidebar-footer">
@@ -111,6 +112,7 @@ export class DashboardPage {
           </div>
         </nav>
         
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
         <main class="main-content" id="main-content">
           <!-- Dynamic content will be loaded here -->
         </main>
@@ -234,6 +236,9 @@ export class DashboardPage {
         });
       });
     }
+    
+    // Re-attach section toggle listeners after updating sidebar
+    this.attachSectionToggleListeners();
   }
 
   updateProductSitesInSidebar() {
@@ -304,6 +309,9 @@ export class DashboardPage {
         });
       });
     }
+    
+    // Re-attach section toggle listeners after updating sidebar
+    this.attachSectionToggleListeners();
   }
 
   formatDate(timestamp) {
@@ -345,11 +353,10 @@ export class DashboardPage {
       this.closeSidebar();
     });
 
-    // Close sidebar when clicking outside on mobile
-    mainContent.addEventListener('click', () => {
-      if (window.innerWidth <= 768 && sidebar.classList.contains('sidebar-open')) {
-        this.closeSidebar();
-      }
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      this.handleWindowResize();
     });
 
     // Navigation items
@@ -395,9 +402,17 @@ export class DashboardPage {
       this.loadUserData();
     });
 
-    // Collapsible sections
+    // Collapsible sections - attach after DOM is ready
+    this.attachSectionToggleListeners();
+  }
+
+  attachSectionToggleListeners() {
     const sectionHeaders = this.element.querySelectorAll('.nav-section-header');
     sectionHeaders.forEach(header => {
+      // Remove existing listeners to prevent duplicates
+      header.removeEventListener('click', this.handleSectionToggle);
+      
+      // Add new listener
       header.addEventListener('click', (e) => {
         e.stopPropagation();
         this.toggleSection(header);
@@ -408,21 +423,48 @@ export class DashboardPage {
   toggleSidebar() {
     const sidebar = this.element.querySelector('#sidebar');
     const hamburgerMenu = this.element.querySelector('#hamburger-menu');
-    const isOpen = sidebar.classList.toggle('sidebar-open');
+    const sidebarOverlay = this.element.querySelector('#sidebar-overlay');
     
-    // Update ARIA attributes for accessibility
-    hamburgerMenu.setAttribute('aria-expanded', isOpen.toString());
-    hamburgerMenu.classList.toggle('active', isOpen);
+    // Only handle mobile toggle behavior
+    if (window.innerWidth <= 768) {
+      const isOpen = sidebar.classList.toggle('sidebar-open');
+      sidebarOverlay.classList.toggle('show', isOpen);
+      
+      // Update ARIA attributes for accessibility
+      hamburgerMenu.setAttribute('aria-expanded', isOpen.toString());
+      hamburgerMenu.classList.toggle('active', isOpen);
+    }
   }
 
   closeSidebar() {
     const sidebar = this.element.querySelector('#sidebar');
     const hamburgerMenu = this.element.querySelector('#hamburger-menu');
-    sidebar.classList.remove('sidebar-open');
+    const sidebarOverlay = this.element.querySelector('#sidebar-overlay');
     
-    // Update ARIA attributes for accessibility
-    hamburgerMenu.setAttribute('aria-expanded', 'false');
-    hamburgerMenu.classList.remove('active');
+    // Only handle mobile close behavior
+    if (window.innerWidth <= 768) {
+      sidebar.classList.remove('sidebar-open');
+      sidebarOverlay.classList.remove('show');
+      
+      // Update ARIA attributes for accessibility
+      hamburgerMenu.setAttribute('aria-expanded', 'false');
+      hamburgerMenu.classList.remove('active');
+    }
+  }
+
+  // Handle window resize to ensure proper behavior
+  handleWindowResize() {
+    const sidebar = this.element.querySelector('#sidebar');
+    const hamburgerMenu = this.element.querySelector('#hamburger-menu');
+    const sidebarOverlay = this.element.querySelector('#sidebar-overlay');
+    
+    if (window.innerWidth > 768) {
+      // Desktop: Remove mobile classes and reset state
+      sidebar.classList.remove('sidebar-open');
+      sidebarOverlay.classList.remove('show');
+      hamburgerMenu.setAttribute('aria-expanded', 'false');
+      hamburgerMenu.classList.remove('active');
+    }
   }
 
   toggleSection(header) {
@@ -430,14 +472,22 @@ export class DashboardPage {
     const subsection = section.querySelector('.nav-subsection');
     const arrow = header.querySelector('.nav-arrow');
     
-    if (subsection && (subsection.style.display === 'none' || !subsection.style.display)) {
-      subsection.style.display = 'block';
-      arrow.className = 'nav-arrow fas fa-chevron-down';
-      section.classList.add('expanded');
-    } else if (subsection) {
-      subsection.style.display = 'none';
-      arrow.className = 'nav-arrow fas fa-chevron-right';
-      section.classList.remove('expanded');
+    if (subsection) {
+      const isExpanded = section.classList.contains('expanded');
+      
+      if (isExpanded) {
+        subsection.style.display = 'none';
+        if (arrow) {
+          arrow.className = 'nav-arrow fas fa-chevron-right';
+        }
+        section.classList.remove('expanded');
+      } else {
+        subsection.style.display = 'block';
+        if (arrow) {
+          arrow.className = 'nav-arrow fas fa-chevron-down';
+        }
+        section.classList.add('expanded');
+      }
     }
   }
 
@@ -446,14 +496,22 @@ export class DashboardPage {
     const subsection = section.querySelector('.nav-sub-subsection');
     const arrow = header.querySelector('.nav-arrow');
     
-    if (subsection && (subsection.style.display === 'none' || !subsection.style.display)) {
-      subsection.style.display = 'block';
-      arrow.className = 'nav-arrow fas fa-chevron-down';
-      section.classList.add('expanded');
-    } else if (subsection) {
-      subsection.style.display = 'none';
-      arrow.className = 'nav-arrow fas fa-chevron-right';
-      section.classList.remove('expanded');
+    if (subsection) {
+      const isExpanded = section.classList.contains('expanded');
+      
+      if (isExpanded) {
+        subsection.style.display = 'none';
+        if (arrow) {
+          arrow.className = 'nav-arrow fas fa-chevron-right';
+        }
+        section.classList.remove('expanded');
+      } else {
+        subsection.style.display = 'block';
+        if (arrow) {
+          arrow.className = 'nav-arrow fas fa-chevron-down';
+        }
+        section.classList.add('expanded');
+      }
     }
   }
 
