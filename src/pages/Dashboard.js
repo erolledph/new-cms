@@ -35,15 +35,16 @@ export class DashboardPage {
     this.element.innerHTML = `
       <div class="dashboard-body">
         <button class="hamburger-menu" id="hamburger-menu" aria-expanded="false" aria-controls="sidebar" aria-label="Toggle navigation menu">
-          <span class="hamburger-line"></span>
-          <span class="hamburger-line"></span>
-          <span class="hamburger-line"></span>
+          <i class="hamburger-icon fas fa-bars"></i>
         </button>
         
         <nav class="sidebar" id="sidebar">
           <div class="sidebar-content">
             <div class="sidebar-header">
               <h1 class="cms-title">Firebase CMS</h1>
+              <button class="sidebar-close-button" id="sidebar-close-button" aria-label="Close navigation menu">
+                <i class="fas fa-times"></i>
+              </button>
             </div>
             
             <div class="sidebar-nav">
@@ -63,7 +64,7 @@ export class DashboardPage {
                   <span class="nav-text">Products</span>
                   <i class="nav-arrow fas fa-chevron-right"></i>
                 </div>
-                <div class="nav-subsection" id="products-subsection" style="display: none;">
+                <div class="nav-subsection" id="products-subsection">
                   <div class="nav-subitem" data-section="create-product-site">
                     <i class="nav-icon fas fa-plus"></i>
                     <span class="nav-text">Create Product Site</span>
@@ -78,7 +79,7 @@ export class DashboardPage {
                   <span class="nav-text">Blog</span>
                   <i class="nav-arrow fas fa-chevron-right"></i>
                 </div>
-                <div class="nav-subsection" id="blog-subsection" style="display: none;">
+                <div class="nav-subsection" id="blog-subsection">
                   <div class="nav-subitem" data-section="create-blog-site">
                     <i class="nav-icon fas fa-plus"></i>
                     <span class="nav-text">Create Blog Site</span>
@@ -190,7 +191,7 @@ export class DashboardPage {
             <span class="nav-text">${blogSite.name}</span>
             <i class="nav-arrow fas fa-chevron-right"></i>
           </div>
-          <div class="nav-sub-subsection" style="display: none;">
+          <div class="nav-sub-subsection">
             <div class="nav-sub-subitem" data-section="create-content-${blogSite.id}">
               <i class="nav-icon fas fa-plus"></i>
               <span class="nav-text">Create Content</span>
@@ -263,7 +264,7 @@ export class DashboardPage {
             <span class="nav-text">${productSite.name}</span>
             <i class="nav-arrow fas fa-chevron-right"></i>
           </div>
-          <div class="nav-sub-subsection" style="display: none;">
+          <div class="nav-sub-subsection">
             <div class="nav-sub-subitem" data-section="create-product-${productSite.id}">
               <i class="nav-icon fas fa-plus"></i>
               <span class="nav-text">Create Product</span>
@@ -335,6 +336,7 @@ export class DashboardPage {
     // Logout button
     const logoutButton = this.element.querySelector('#logout-button');
     const hamburgerMenu = this.element.querySelector('#hamburger-menu');
+    const sidebarCloseButton = this.element.querySelector('#sidebar-close-button');
     const sidebar = this.element.querySelector('#sidebar');
     const sidebarOverlay = this.element.querySelector('#sidebar-overlay');
     const mainContent = this.element.querySelector('#main-content');
@@ -348,6 +350,10 @@ export class DashboardPage {
       this.toggleSidebar();
     });
 
+    // Sidebar close button
+    sidebarCloseButton.addEventListener('click', () => {
+      this.closeSidebar();
+    });
     // Close sidebar when clicking overlay
     sidebarOverlay.addEventListener('click', () => {
       this.closeSidebar();
@@ -415,7 +421,10 @@ export class DashboardPage {
       // Add new listener
       header.addEventListener('click', (e) => {
         e.stopPropagation();
-        this.toggleSection(header);
+        // Only toggle on desktop, mobile shows all sections expanded
+        if (window.innerWidth > 768) {
+          this.toggleSection(header);
+        }
       });
     });
   }
@@ -424,6 +433,7 @@ export class DashboardPage {
     const sidebar = this.element.querySelector('#sidebar');
     const hamburgerMenu = this.element.querySelector('#hamburger-menu');
     const sidebarOverlay = this.element.querySelector('#sidebar-overlay');
+    const hamburgerIcon = hamburgerMenu.querySelector('.hamburger-icon');
     
     // Only handle mobile toggle behavior
     if (window.innerWidth <= 768) {
@@ -433,6 +443,13 @@ export class DashboardPage {
       // Update ARIA attributes for accessibility
       hamburgerMenu.setAttribute('aria-expanded', isOpen.toString());
       hamburgerMenu.classList.toggle('active', isOpen);
+      
+      // Update hamburger icon
+      if (isOpen) {
+        hamburgerIcon.className = 'hamburger-icon fas fa-times';
+      } else {
+        hamburgerIcon.className = 'hamburger-icon fas fa-bars';
+      }
     }
   }
 
@@ -440,6 +457,7 @@ export class DashboardPage {
     const sidebar = this.element.querySelector('#sidebar');
     const hamburgerMenu = this.element.querySelector('#hamburger-menu');
     const sidebarOverlay = this.element.querySelector('#sidebar-overlay');
+    const hamburgerIcon = hamburgerMenu.querySelector('.hamburger-icon');
     
     // Only handle mobile close behavior
     if (window.innerWidth <= 768) {
@@ -449,6 +467,9 @@ export class DashboardPage {
       // Update ARIA attributes for accessibility
       hamburgerMenu.setAttribute('aria-expanded', 'false');
       hamburgerMenu.classList.remove('active');
+      
+      // Reset hamburger icon
+      hamburgerIcon.className = 'hamburger-icon fas fa-bars';
     }
   }
 
@@ -457,6 +478,7 @@ export class DashboardPage {
     const sidebar = this.element.querySelector('#sidebar');
     const hamburgerMenu = this.element.querySelector('#hamburger-menu');
     const sidebarOverlay = this.element.querySelector('#sidebar-overlay');
+    const hamburgerIcon = hamburgerMenu.querySelector('.hamburger-icon');
     
     if (window.innerWidth > 768) {
       // Desktop: Remove mobile classes and reset state
@@ -464,6 +486,20 @@ export class DashboardPage {
       sidebarOverlay.classList.remove('show');
       hamburgerMenu.setAttribute('aria-expanded', 'false');
       hamburgerMenu.classList.remove('active');
+      hamburgerIcon.className = 'hamburger-icon fas fa-bars';
+      
+      // Re-enable section toggling on desktop
+      this.attachSectionToggleListeners();
+    } else {
+      // Mobile: Ensure all sections are expanded
+      const sections = this.element.querySelectorAll('.nav-section');
+      sections.forEach(section => {
+        section.classList.add('expanded');
+        const subsection = section.querySelector('.nav-subsection');
+        if (subsection) {
+          subsection.style.display = 'block';
+        }
+      });
     }
   }
 
@@ -476,17 +512,15 @@ export class DashboardPage {
       const isExpanded = section.classList.contains('expanded');
       
       if (isExpanded) {
-        subsection.style.display = 'none';
+        section.classList.remove('expanded');
         if (arrow) {
           arrow.className = 'nav-arrow fas fa-chevron-right';
         }
-        section.classList.remove('expanded');
       } else {
-        subsection.style.display = 'block';
+        section.classList.add('expanded');
         if (arrow) {
           arrow.className = 'nav-arrow fas fa-chevron-down';
         }
-        section.classList.add('expanded');
       }
     }
   }
@@ -500,17 +534,15 @@ export class DashboardPage {
       const isExpanded = section.classList.contains('expanded');
       
       if (isExpanded) {
-        subsection.style.display = 'none';
+        section.classList.remove('expanded');
         if (arrow) {
           arrow.className = 'nav-arrow fas fa-chevron-right';
         }
-        section.classList.remove('expanded');
       } else {
-        subsection.style.display = 'block';
+        section.classList.add('expanded');
         if (arrow) {
           arrow.className = 'nav-arrow fas fa-chevron-down';
         }
-        section.classList.add('expanded');
       }
     }
   }
